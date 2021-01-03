@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:TransitEasy/screens/navigation/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:TransitEasy/common/widgets/floating_menu.dart';
 
 class StopsLocationScreen extends StatefulWidget {
   @override
@@ -29,18 +30,7 @@ class _StopsLocationScreenState extends State<StopsLocationScreen> {
               _controller.complete(controller);
             },
           ),
-          Positioned(
-            left: -10,
-            top: 50,
-            child: RawMaterialButton(
-                shape: CircleBorder(),
-                fillColor: Colors.white,
-                elevation: 2.0,
-                child: IconButton(
-                  icon: Icon(Icons.menu, size: 30, color: Colors.black),
-                  onPressed: () => _scaffoldKey.currentState.openDrawer(),
-                )),
-          )
+          FloatingMenu(onTap: () => _scaffoldKey.currentState.openDrawer())
         ]),
         drawer: _navBar);
   }

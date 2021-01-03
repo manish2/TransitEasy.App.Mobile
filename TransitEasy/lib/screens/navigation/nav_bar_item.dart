@@ -6,27 +6,27 @@ class NavbarItem extends StatelessWidget {
   final String title;
   final IconData icon;
   final bool showDivider;
-  const NavbarItem({Key key, this.icon, this.title, this.showDivider})
+  final Function onTapListener;
+  const NavbarItem(
+      {Key key, this.icon, this.title, this.showDivider, this.onTapListener})
       : super(key: key);
 
   List<Widget> buildChildren() {
     List<Widget> builder = [
-      new Opacity(
-        opacity: 0.55,
-        child: ListTile(
-            tileColor: Colors.white,
-            leading:
-                SizedBox(height: 30, child: Icon(icon, color: Colors.black)),
-            title: Text(
-              title,
-              style: appFont,
-            )),
-      )
+      new ListTile(
+          onTap: onTapListener,
+          visualDensity: VisualDensity(horizontal: 0, vertical: 0),
+          //tileColor: Colors.white,
+          leading: SizedBox(height: 30, child: Icon(icon, color: Colors.white)),
+          title: Text(
+            title,
+            style: appFont,
+          )),
     ];
-    if (showDivider)
-      builder.add(new Divider(
-        height: 5,
-      ));
+    //if (showDivider)
+    //  builder.add(new Divider(
+    //     height: 5,
+    //  ));
     return builder;
   }
 
