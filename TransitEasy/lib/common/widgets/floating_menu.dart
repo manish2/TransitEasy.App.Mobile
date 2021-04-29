@@ -12,10 +12,10 @@ class FloatingMenu extends StatelessWidget {
       top: 50,
       child: RawMaterialButton(
           shape: CircleBorder(),
-          fillColor: Colors.white,
+          fillColor: Color.fromRGBO(221, 160, 221, .6),
           elevation: 2.0,
           child: IconButton(
-            icon: Icon(Icons.menu, size: 30, color: Colors.black),
+            icon: Icon(Icons.menu, size: 30, color: Colors.white),
             onPressed: onTap,
           ),
           onPressed: onTap),

@@ -1,7 +1,8 @@
+import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:TransitEasy/constants.dart';
-import 'package:TransitEasy/screens/navigation/nav_bar_item.dart';
-import 'package:TransitEasy/screens/settings.dart';
-import 'package:TransitEasy/screens/stops_location.dart';
+import 'package:TransitEasy/common/widgets/navigation/nav_bar_item.dart';
+import 'package:TransitEasy/screens/settings/settings.dart';
+import 'package:TransitEasy/screens/stopslocation/stops_location.dart';
 import 'package:flutter/material.dart';
 
 class NavBar extends StatelessWidget {
@@ -15,16 +16,13 @@ class NavBar extends StatelessWidget {
     return Drawer(
         child: Container(
             decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [gradientStartColor, gradientEndColor],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: [0.3, 0.7])),
+              color: Color.fromRGBO(51, 0, 123, .95),
+            ),
             padding: EdgeInsets.only(top: getTopPadding(context)),
             child: ListView(padding: EdgeInsets.zero, children: <Widget>[
               NavbarItem(
                 title: 'Stops near me',
-                icon: Icons.stop_sharp,
+                icon: Icons.bus_alert,
                 showDivider: true,
                 onTapListener: () {
                   Navigator.of(context).pop();

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Color gradientStartColor = Color.fromRGBO(201, 75, 75, 0.9);
-Color gradientEndColor = Color(0xFF9354B9);
+Color gradientStartColor = Color.fromRGBO(0, 0, 128, 0.9);
+//Color gradientEndColor = Color(0xFF9354B9);
+Color gradientEndColor = Color.fromRGBO(51, 0, 123, 0.6);
+
+Color appPageColor = Color.fromRGBO(51, 0, 123, .95);
+//Color gradientEndColor = Color(0xDC2424);
 TextStyle appFont =
-    GoogleFonts.lato(textStyle: TextStyle(fontSize: 20), color: Colors.white);
+    GoogleFonts.lato(textStyle: TextStyle(fontSize: 20), color: Colors.black);
