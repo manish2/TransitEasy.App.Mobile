@@ -1,8 +1,6 @@
 import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
-
 class SettingsLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
