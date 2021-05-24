@@ -1,4 +1,5 @@
 import 'package:TransitEasy/common/utils/font_builder.dart';
+import 'package:TransitEasy/screens/settings/edit_stops/edit_stops.dart';
 import 'package:flutter/material.dart';
 
 class SettingsLayout extends StatelessWidget {
@@ -24,6 +25,13 @@ class SettingsLayout extends StatelessWidget {
                   Icons.keyboard_arrow_right,
                   color: Colors.white,
                 ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              new EditStopsScreen()));
+                },
               )),
           Card(
               elevation: 8.0,

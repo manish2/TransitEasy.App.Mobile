@@ -19,9 +19,9 @@ class SettingsService {
         busLocationRefreshIntervalSeconds);
   }
 
-  void setStopsSearchRadiusMetersSetting(int searchRadiusMeters) async {
+  Future<bool> setStopsSearchRadiusMetersSetting(int searchRadiusMeters) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('stopsSearchRadiusMeters', searchRadiusMeters);
+    return prefs.setInt('stopsSearchRadiusMeters', searchRadiusMeters);
   }
 
   void setBusLocationRefreshIntervalSecondsSetting(

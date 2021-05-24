@@ -1,22 +1,25 @@
+import 'dart:async';
 import 'package:TransitEasy/common/services/locations_services.dart';
-import 'package:TransitEasy/common/widgets/navigation/nav_bar.dart';
-import 'package:TransitEasy/screens/stopslocation/stops_location_layout.dart';
-import 'package:flutter/material.dart';
 import 'package:TransitEasy/common/widgets/floating_menu.dart';
+import 'package:TransitEasy/common/widgets/navigation/nav_bar.dart';
 import 'package:TransitEasy/common/widgets/permissions_request.dart';
+import 'package:TransitEasy/screens/settings/edit_stops/edit_stops_layout.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_conditional_rendering/conditional.dart';
 import 'package:geolocator/geolocator.dart';
 
-class StopsLocationScreen extends StatefulWidget {
+class EditStopsScreen extends StatefulWidget {
   @override
-  _StopsLocationScreenState createState() => _StopsLocationScreenState();
+  State<StatefulWidget> createState() => _EditStopsScreenState();
 }
 
-class _StopsLocationScreenState extends State<StopsLocationScreen> {
-  bool _isLocationPermissionEnabled = false;
+class _EditStopsScreenState extends State<EditStopsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final LocationService _locationService = LocationService();
   final NavBar _navBar = new NavBar();
-  final LocationService _locationService = new LocationService();
+
+  bool _isLocationPermissionEnabled = false;
+
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -26,7 +29,6 @@ class _StopsLocationScreenState extends State<StopsLocationScreen> {
             })
           });
     });
-    //
     super.initState();
   }
 
@@ -49,7 +51,7 @@ class _StopsLocationScreenState extends State<StopsLocationScreen> {
               conditionBuilder: (BuildContext context) =>
                   _isLocationPermissionEnabled,
               widgetBuilder: (BuildContext context) {
-                return StopsLocationLayout();
+                return EditStopsLayout();
               },
               fallbackBuilder: (BuildContext context) {
                 return PermissionsRequest(
