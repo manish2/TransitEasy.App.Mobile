@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SettingsService {
   final int defaultStopsSearchRadiusMeters = 100;
   final int defaultBusAlertTrigger = 3;
-  final int defaultBusLocationRefreshIntervalSeconds = 4;
+  final int defaultBusLocationRefreshIntervalSeconds = 5;
 
   Future<UserSettings> getUserSettingsAsync() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -24,14 +24,15 @@ class SettingsService {
     return prefs.setInt('stopsSearchRadiusMeters', searchRadiusMeters);
   }
 
-  void setBusLocationRefreshIntervalSecondsSetting(
+  Future<bool> setBusLocationRefreshIntervalSecondsSetting(
       int busLocationInterval) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('busLocationRefreshIntervalSeconds', busLocationInterval);
+    return prefs.setInt(
+        'busLocationRefreshIntervalSeconds', busLocationInterval);
   }
 
-  void setbusAlertTriggerSetting(int busAlertTrigger) async {
+  Future<bool> setbusAlertTriggerSetting(int busAlertTrigger) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt('busAlertTrigger', busAlertTrigger);
+    return prefs.setInt('busAlertTrigger', busAlertTrigger);
   }
 }

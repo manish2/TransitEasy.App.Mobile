@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 class PermissionsRequest extends StatelessWidget {
-  final Function onPressed;
+  final Function() onPressed;
   final String userPrompt;
   final String buttonText;
   const PermissionsRequest(
-      {Key key, this.onPressed, this.userPrompt, this.buttonText})
+      {Key? key,
+      required this.onPressed,
+      required this.userPrompt,
+      required this.buttonText})
       : super(key: key);
 
   @override

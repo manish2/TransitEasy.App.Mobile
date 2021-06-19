@@ -34,13 +34,15 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
       ],
     ),
   );
+
   Set<Marker> _markers = {};
   Set<Circle> _circles = {};
-  double _sliderValue;
-  LatLng _latLng;
+  late double _sliderValue;
+  late LatLng _latLng;
+  late double _savedSearchRadius;
+
   bool _isFirstRun = true;
   bool _isSaveEnabled = false;
-  double _savedSearchRadius;
 
   Future<CameraPosition> getCurrentPosition() => _locationService
           .getCurrentUserPosition()
@@ -56,9 +58,9 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
               fillColor: Color.fromRGBO(221, 160, 221, .6),
               strokeColor: appPageColor,
               radius: settings.searchRadiusKm.toDouble(),
-              circleId: CircleId("test")));
+              circleId: CircleId("selected_range")));
           _markers.add(Marker(
-              markerId: MarkerId("a"),
+              markerId: MarkerId("curr_pos_marker"),
               position: _latLng,
               icon: BitmapDescriptor.defaultMarkerWithHue(
                   BitmapDescriptor.hueRed),
@@ -79,7 +81,7 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
           fillColor: Color.fromRGBO(221, 160, 221, .6),
           strokeColor: appPageColor,
           radius: newSliderValue,
-          circleId: CircleId("test")));
+          circleId: CircleId("selected_range")));
     });
   }
 
@@ -98,6 +100,10 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
             });
   }
 
+  void handleOnCancelPress() {
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     _fToast.init(context);
@@ -111,7 +117,7 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
         builder:
             (BuildContext context, AsyncSnapshot<CameraPosition> snapshot) {
           Widget result;
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.data != null) {
             result = Column(
               children: <Widget>[
                 Container(
@@ -120,7 +126,7 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
                         child: GoogleMap(
                           mapType: MapType.normal,
                           zoomControlsEnabled: true,
-                          initialCameraPosition: snapshot.data,
+                          initialCameraPosition: snapshot.data!,
                           onMapCreated: (GoogleMapController controller) {
                             _controller.complete(controller);
                           },
@@ -138,10 +144,16 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
                   label: "$_sliderValue",
                   inactiveColor: Color.fromRGBO(221, 160, 221, .6),
                 ),
-                ElevatedButton(
-                    onPressed:
-                        _isSaveEnabled ? () => handleOnSavePress() : null,
-                    child: Text("Save"))
+                Row(
+                  children: <Widget>[
+                    ElevatedButton(
+                        onPressed: handleOnCancelPress, child: Text("Cancel")),
+                    ElevatedButton(
+                        onPressed: _isSaveEnabled ? handleOnSavePress : null,
+                        child: Text("Save"))
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                )
               ],
               mainAxisAlignment: MainAxisAlignment.center,
             );

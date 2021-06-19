@@ -4,6 +4,9 @@ class LocationService {
   Future<bool> isLocationServiceEnabled() =>
       Geolocator.isLocationServiceEnabled();
 
+  Future<bool> isLocationPermissionEnabled() =>
+      Geolocator.isLocationServiceEnabled();
+
   Future<LocationPermission> requestLocationPermission() =>
       Geolocator.requestPermission();
 

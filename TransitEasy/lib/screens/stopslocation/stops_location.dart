@@ -61,7 +61,7 @@ class _StopsLocationScreenState extends State<StopsLocationScreen> {
                   buttonText: "Enable Location",
                 );
               }),
-          FloatingMenu(onTap: () => _scaffoldKey.currentState.openDrawer())
+          FloatingMenu(onTap: () => _scaffoldKey.currentState!.openDrawer())
         ]),
         drawer: _navBar);
   }

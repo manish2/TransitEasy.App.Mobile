@@ -6,9 +6,13 @@ class NavbarItem extends StatelessWidget {
   final String title;
   final IconData icon;
   final bool showDivider;
-  final Function onTapListener;
+  final Function() onTapListener;
   const NavbarItem(
-      {Key key, this.icon, this.title, this.showDivider, this.onTapListener})
+      {Key? key,
+      required this.icon,
+      required this.title,
+      required this.showDivider,
+      required this.onTapListener})
       : super(key: key);
 
   List<Widget> buildChildren() {

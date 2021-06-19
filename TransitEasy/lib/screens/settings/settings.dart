@@ -12,7 +12,7 @@ class SettingsScreen extends StatelessWidget {
         key: _scaffoldKey,
         body: Stack(children: <Widget>[
           SettingsLayout(),
-          FloatingMenu(onTap: () => _scaffoldKey.currentState.openDrawer())
+          FloatingMenu(onTap: () => _scaffoldKey.currentState!.openDrawer())
         ]),
         drawer: _navBar);
   }

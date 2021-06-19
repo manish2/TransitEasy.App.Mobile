@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class FloatingMenu extends StatelessWidget {
-  final Function onTap;
+  final Function() onTap;
 
-  const FloatingMenu({Key key, this.onTap}) : super(key: key);
+  const FloatingMenu({Key? key, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

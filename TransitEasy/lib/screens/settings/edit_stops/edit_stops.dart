@@ -63,7 +63,7 @@ class _EditStopsScreenState extends State<EditStopsScreen> {
                   buttonText: "Enable Location",
                 );
               }),
-          FloatingMenu(onTap: () => _scaffoldKey.currentState.openDrawer())
+          FloatingMenu(onTap: () => _scaffoldKey.currentState!.openDrawer())
         ]),
         drawer: _navBar);
   }
