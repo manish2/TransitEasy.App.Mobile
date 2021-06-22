@@ -12,7 +12,7 @@ import 'package:geolocator/geolocator.dart';
 
 class PermissionsBloc extends Bloc<PermissionsEvent, PermissionsState> {
   final GeoLocationService geoLocationService;
-
+//
   PermissionsBloc(this.geoLocationService) : super(PermissionsInitial());
 
   @override
