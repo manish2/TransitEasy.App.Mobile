@@ -3,6 +3,8 @@ import 'package:TransitEasy/blocs/permissions_bloc.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_load_success.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_state.dart';
 import 'package:TransitEasy/blocs/stopslocationmap_bloc.dart';
+import 'package:TransitEasy/common/widgets/floating_menu.dart';
+import 'package:TransitEasy/common/widgets/navigation/nav_bar.dart';
 import 'package:TransitEasy/constants.dart';
 import 'package:TransitEasy/models/permissiontype.dart';
 import 'package:TransitEasy/screens/stopslocation/stops_locations_layout.dart';
@@ -10,7 +12,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class StopsLocationsV2 extends StatelessWidget {
+class StopsLocationsScreen extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _StopsLocationsState();
+}
+
+class _StopsLocationsState extends State<StopsLocationsScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final NavBar _navBar = new NavBar();
   final List<PermissionType> _requiredPermissions = [PermissionType.Location];
   Widget loadWhenPermissionsReturned(
       PermissionsLoadSuccess permissions, StopsLocationsMapBloc mapBloc) {
@@ -37,17 +46,27 @@ class StopsLocationsV2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PermissionsBloc permissionBloc =
-        BlocProvider.of<PermissionsBloc>(context);
     final StopsLocationsMapBloc mapBloc =
         BlocProvider.of<StopsLocationsMapBloc>(context);
+    final PermissionsBloc permissionBloc =
+        BlocProvider.of<PermissionsBloc>(context);
     permissionBloc.add(PermissionsRequested(_requiredPermissions));
 
     return BlocBuilder<PermissionsBloc, PermissionsState>(
         bloc: permissionBloc,
         builder: (context, state) {
           if (state is PermissionsLoadSuccess) {
-            return loadWhenPermissionsReturned(state, mapBloc);
+            return new Scaffold(
+              key: _scaffoldKey,
+              drawer: _navBar,
+              body: Stack(
+                children: [
+                  loadWhenPermissionsReturned(state, mapBloc),
+                  FloatingMenu(
+                      onTap: () => _scaffoldKey.currentState!.openDrawer())
+                ],
+              ),
+            );
           } else {
             return getLoadingScreen();
           }

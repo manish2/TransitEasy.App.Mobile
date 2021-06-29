@@ -1,5 +1,5 @@
 import 'package:TransitEasy/blocs/states/stopsinfo/stopsinfo_state.dart';
-import 'package:TransitEasy/common/models/stop_info.dart';
+import 'package:TransitEasy/clients/models/stop_info.dart';
 
 class StopsInfoLoadSuccess extends StopsInfoState {
   final List<StopInfo> stopsInfo;

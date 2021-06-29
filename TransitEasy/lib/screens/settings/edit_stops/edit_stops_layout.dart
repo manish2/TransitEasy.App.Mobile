@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:TransitEasy/common/services/locations_services.dart';
-import 'package:TransitEasy/common/services/settings_service.dart';
+import 'package:TransitEasy/services/geolocation_service.dart';
+import 'package:TransitEasy/services/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,7 +14,7 @@ class EditStopsLayout extends StatefulWidget {
 
 class EditStopsLayoutState extends State<EditStopsLayout> {
   Completer<GoogleMapController> _controller = Completer();
-  final LocationService _locationService = LocationService();
+  final GeoLocationService _geoLocationService = GeoLocationService();
   final SettingsService _settingsService = SettingsService();
   final FToast _fToast = FToast();
   final Widget _successToast = Container(
@@ -44,10 +44,10 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
   bool _isFirstRun = true;
   bool _isSaveEnabled = false;
 
-  Future<CameraPosition> getCurrentPosition() => _locationService
-          .getCurrentUserPosition()
+  Future<CameraPosition> getCurrentPosition() => _geoLocationService
+          .getCurrentUserGeoLocation()
           .then<CameraPosition>((value) async {
-        if (_isFirstRun == null || _isFirstRun) {
+        if (_isFirstRun) {
           _latLng = LatLng(value.latitude, value.longitude);
           var settings = await _settingsService.getUserSettingsAsync();
           _savedSearchRadius = settings.searchRadiusKm.toDouble();

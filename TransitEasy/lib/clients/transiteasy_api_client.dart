@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:TransitEasy/common/models/nearby_stops_result.dart';
+import 'package:TransitEasy/clients/models/nearby_stops_result.dart';
 import 'package:http/http.dart' as http;
 
 class TransitEasyApiClient {
@@ -12,7 +12,9 @@ class TransitEasyApiClient {
       'currentLong': '$currLong',
       'radius': '$radius'
     });
-    var nearbyStopsRespone = await http.get(uri);
+    var nearbyStopsRespone =
+        await http.get(uri).timeout(const Duration(seconds: 3));
+
     if (nearbyStopsRespone.statusCode != 200) {
       throw Exception('error getting neaby stops');
     }

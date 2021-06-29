@@ -1,4 +1,3 @@
-import 'package:TransitEasy/blocs/states/userlocation/userlocation_state.dart';
 import 'package:TransitEasy/blocs/states/usersettings/usersettings_state.dart';
 import 'package:TransitEasy/models/usersettings.dart';
 

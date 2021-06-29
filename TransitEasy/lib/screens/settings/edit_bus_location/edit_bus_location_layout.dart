@@ -1,5 +1,5 @@
-import 'package:TransitEasy/common/services/settings_service.dart';
 import 'package:TransitEasy/common/utils/font_builder.dart';
+import 'package:TransitEasy/services/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:numberpicker/numberpicker.dart';

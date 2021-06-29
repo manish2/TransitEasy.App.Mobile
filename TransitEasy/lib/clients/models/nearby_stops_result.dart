@@ -1,5 +1,5 @@
-import 'package:TransitEasy/common/models/api_response_status.dart';
-import 'package:TransitEasy/common/models/stop_info.dart';
+import 'package:TransitEasy/clients/models/api_response_status.dart';
+import 'package:TransitEasy/clients/models/stop_info.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'nearby_stops_result.g.dart';
 

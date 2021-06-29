@@ -5,8 +5,8 @@ import 'package:TransitEasy/blocs/states/stopsinfo/stopsinfo_load_in_progress.da
 import 'package:TransitEasy/blocs/states/stopsinfo/stopsinfo_load_sucess.dart';
 import 'package:TransitEasy/blocs/states/stopsinfo/stopsinfo_loadfailure.dart';
 import 'package:TransitEasy/blocs/states/stopsinfo/stopsinfo_state.dart';
-import 'package:TransitEasy/common/models/api_response_status.dart';
-import 'package:TransitEasy/common/models/nearby_stops_result.dart';
+import 'package:TransitEasy/clients/models/api_response_status.dart';
+import 'package:TransitEasy/clients/models/nearby_stops_result.dart';
 import 'package:TransitEasy/repositories/transiteasy_repository.dart';
 import 'package:bloc/bloc.dart';
 

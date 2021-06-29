@@ -1,5 +1,4 @@
-import 'package:TransitEasy/common/models/nearby_stops_result.dart';
-import 'package:TransitEasy/common/models/stop_info.dart';
+import 'package:TransitEasy/clients/models/nearby_stops_result.dart';
 import 'package:TransitEasy/clients/transiteasy_api_client.dart';
 
 class TransitEasyRepository {

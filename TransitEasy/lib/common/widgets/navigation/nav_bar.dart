@@ -1,8 +1,6 @@
-import 'package:TransitEasy/common/utils/font_builder.dart';
-import 'package:TransitEasy/constants.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar_item.dart';
 import 'package:TransitEasy/screens/settings/settings.dart';
-import 'package:TransitEasy/screens/stopslocation/stops_location.dart';
+import 'package:TransitEasy/screens/stopslocation/stops_locations.dart';
 import 'package:flutter/material.dart';
 
 class NavBar extends StatelessWidget {
@@ -30,7 +28,7 @@ class NavBar extends StatelessWidget {
                       context,
                       new MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              new StopsLocationScreen()));
+                              new StopsLocationsScreen()));
                 },
               ),
               NavbarItem(
