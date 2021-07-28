@@ -24,11 +24,11 @@ class NavbarItem extends StatelessWidget {
         child: new ListTile(
             onTap: onTapListener,
             visualDensity: VisualDensity(horizontal: 0, vertical: 0),
-            leading:
-                SizedBox(height: 30, child: Icon(icon, color: Colors.white)),
+            leading: SizedBox(
+                height: 30, child: Icon(icon, color: Colors.cyanAccent)),
             title: Text(
               title,
-              style: FontBuilder.buildCommonAppThemeFont(20, Colors.white),
+              style: FontBuilder.buildCommonAppThemeFont(20, Colors.cyanAccent),
             )),
       )
     ];

@@ -1,6 +1,7 @@
 import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:TransitEasy/screens/settings/edit_alerts/edit_alerts.dart';
 import 'package:TransitEasy/screens/settings/edit_bus_location/edit_bus_location.dart';
+import 'package:TransitEasy/screens/settings/edit_next_buses/edit_next_buses.dart';
 import 'package:TransitEasy/screens/settings/edit_stops/edit_stops.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +24,14 @@ class SettingsLayout extends StatelessWidget {
         barrierColor: appPageColor);
   }
 
+  static Route<void> _editNextBusesBuild(
+      BuildContext context, Object? arguments) {
+    return DialogRoute<void>(
+        context: context,
+        builder: (BuildContext context) => const EditNextBusesScreen(),
+        barrierColor: appPageColor);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -35,15 +44,16 @@ class SettingsLayout extends StatelessWidget {
               elevation: 8.0,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
-              color: Color.fromRGBO(221, 160, 221, .6),
+              color: Colors.cyanAccent,
               child: ListTile(
                 title: Text(
                   "Edit default stops search radius",
-                  style: FontBuilder.buildCommonAppThemeFont(18, Colors.white),
+                  style:
+                      FontBuilder.buildCommonAppThemeFont(18, Colors.black87),
                 ),
                 trailing: Icon(
-                  Icons.keyboard_arrow_right,
-                  color: Colors.white,
+                  Icons.edit,
+                  color: Colors.black87,
                 ),
                 onTap: () {
                   Navigator.push(
@@ -57,15 +67,16 @@ class SettingsLayout extends StatelessWidget {
               elevation: 8.0,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
-              color: Color.fromRGBO(221, 160, 221, .6),
+              color: Colors.cyanAccent,
               child: ListTile(
                 title: Text(
                   "Edit when to alert me about my bus",
-                  style: FontBuilder.buildCommonAppThemeFont(18, Colors.white),
+                  style:
+                      FontBuilder.buildCommonAppThemeFont(18, Colors.black87),
                 ),
                 trailing: Icon(
-                  Icons.keyboard_arrow_right,
-                  color: Colors.white,
+                  Icons.edit,
+                  color: Colors.black87,
                 ),
                 onTap: () {
                   Navigator.restorablePush(context, _editAlertsBuilder);
@@ -75,20 +86,40 @@ class SettingsLayout extends StatelessWidget {
               elevation: 8.0,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
-              color: Color.fromRGBO(221, 160, 221, .6),
+              color: Colors.cyanAccent,
               child: ListTile(
                 title: Text(
                   "Edit bus location refresh interval",
-                  style: FontBuilder.buildCommonAppThemeFont(18, Colors.white),
+                  style:
+                      FontBuilder.buildCommonAppThemeFont(18, Colors.black87),
                 ),
                 trailing: Icon(
-                  Icons.keyboard_arrow_right,
-                  color: Colors.white,
+                  Icons.edit,
+                  color: Colors.black87,
                 ),
                 onTap: () {
                   Navigator.restorablePush(context, _editBusLocationBuild);
                 },
-              ))
+              )),
+          Card(
+              elevation: 8.0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0)),
+              color: Colors.cyanAccent,
+              child: ListTile(
+                title: Text(
+                  "Edit how many buses to search for at a stop",
+                  style:
+                      FontBuilder.buildCommonAppThemeFont(18, Colors.black87),
+                ),
+                trailing: Icon(
+                  Icons.edit,
+                  color: Colors.black87,
+                ),
+                onTap: () {
+                  Navigator.restorablePush(context, _editNextBusesBuild);
+                },
+              )),
         ]));
   }
 }

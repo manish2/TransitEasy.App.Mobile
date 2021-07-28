@@ -1,4 +1,6 @@
 import 'package:TransitEasy/clients/models/stop_info.dart';
+import 'package:TransitEasy/common/utils/font_builder.dart';
+import 'package:TransitEasy/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -19,22 +21,32 @@ class StopDetails extends StatelessWidget {
         children: [
           Text(
             "Stop Number: ${stopInfo.stopNo}",
+            style: FontBuilder.buildCommonAppThemeFont(16, Colors.cyanAccent),
           ),
-          SizedBox(
-            height: 20,
-          ),
-          Text("Stop Name: ${stopInfo.stopName}"),
-          SizedBox(
-            height: 20,
-          ),
-          Text("Distance from you: ${stopInfo.distance} meters"),
           SizedBox(
             height: 20,
           ),
           Text(
-              "Routes currently servicing this stop: ${_getStopRoutesText(stopInfo)}")
+            "Stop Name: ${stopInfo.stopName}",
+            style: FontBuilder.buildCommonAppThemeFont(16, Colors.cyanAccent),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "Distance from you: ${stopInfo.distance} meters",
+            style: FontBuilder.buildCommonAppThemeFont(16, Colors.cyanAccent),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "Routes currently servicing this stop: ${_getStopRoutesText(stopInfo)}",
+            style: FontBuilder.buildCommonAppThemeFont(16, Colors.cyanAccent),
+          )
         ],
       ),
+      backgroundColor: appPageColor,
     );
   }
 }

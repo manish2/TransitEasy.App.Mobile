@@ -1,89 +1,46 @@
 import 'dart:async';
-import 'package:TransitEasy/services/geolocation_service.dart';
+import 'package:TransitEasy/blocs/events/stopslocationmap/stopslocationmap_requested.dart';
+import 'package:TransitEasy/blocs/events/stopslocationmapconfig/locationradius_decremented.dart';
+import 'package:TransitEasy/blocs/events/stopslocationmapconfig/locationradius_incremented.dart';
+import 'package:TransitEasy/blocs/events/stopslocationmapconfig/locationradius_initial.dart';
+import 'package:TransitEasy/blocs/locationradiusconfig_bloc.dart';
+import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_load_failed.dart';
+import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_load_success.dart';
+import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_state.dart';
+import 'package:TransitEasy/blocs/stopslocationmap_bloc.dart';
+import 'package:TransitEasy/common/utils/font_builder.dart';
+import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/services/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../../constants.dart';
 
 class EditStopsLayout extends StatefulWidget {
+  final StopsLocationsMapBloc stopsLocationsMapBloc;
+  final LocationRadiusConfigBloc locationRadiusConfigBloc;
+  EditStopsLayout(this.stopsLocationsMapBloc, this.locationRadiusConfigBloc);
   @override
-  State<StatefulWidget> createState() => EditStopsLayoutState();
+  State<StatefulWidget> createState() =>
+      EditStopsLayoutState(stopsLocationsMapBloc, locationRadiusConfigBloc);
 }
 
 class EditStopsLayoutState extends State<EditStopsLayout> {
-  Completer<GoogleMapController> _controller = Completer();
-  final GeoLocationService _geoLocationService = GeoLocationService();
+  final StopsLocationsMapBloc stopsLocationsMapBloc;
+  final LocationRadiusConfigBloc locationRadiusConfigBloc;
   final SettingsService _settingsService = SettingsService();
-  final FToast _fToast = FToast();
-  final Widget _successToast = Container(
-    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(25.0),
-      color: Colors.greenAccent,
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.check),
-        SizedBox(
-          width: 12.0,
-        ),
-        Text("Setting updated succesfully!"),
-      ],
-    ),
-  );
 
-  Set<Marker> _markers = {};
-  Set<Circle> _circles = {};
-  late double _sliderValue;
-  late LatLng _latLng;
-  late double _savedSearchRadius;
-
-  bool _isFirstRun = true;
+  int _previousChosenValue = 0;
   bool _isSaveEnabled = false;
+  Completer<GoogleMapController> _controller = Completer();
+  late GoogleMapController _mapController;
 
-  Future<CameraPosition> getCurrentPosition() => _geoLocationService
-          .getCurrentUserGeoLocation()
-          .then<CameraPosition>((value) async {
-        if (_isFirstRun) {
-          _latLng = LatLng(value.latitude, value.longitude);
-          var settings = await _settingsService.getUserSettingsAsync();
-          _savedSearchRadius = settings.searchRadiusKm.toDouble();
-          _sliderValue = _savedSearchRadius;
-          _circles.add(Circle(
-              center: _latLng,
-              strokeWidth: 2,
-              fillColor: Color.fromRGBO(221, 160, 221, .6),
-              strokeColor: appPageColor,
-              radius: settings.searchRadiusKm.toDouble(),
-              circleId: CircleId("selected_range")));
-          _markers.add(Marker(
-              markerId: MarkerId("curr_pos_marker"),
-              position: _latLng,
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueRed),
-              draggable: false));
-          _isFirstRun = false;
-        }
-        return CameraPosition(target: _latLng, zoom: 16.0);
-      });
+  late double _sliderValue;
 
-  void updateValues(double newSliderValue) {
-    setState(() {
-      _isSaveEnabled = _savedSearchRadius != newSliderValue;
-      _sliderValue = newSliderValue;
-      _circles.clear();
-      _circles.add(Circle(
-          center: _latLng,
-          strokeWidth: 2,
-          fillColor: Color.fromRGBO(221, 160, 221, .6),
-          strokeColor: appPageColor,
-          radius: newSliderValue,
-          circleId: CircleId("selected_range")));
-    });
-  }
+  EditStopsLayoutState(
+      this.stopsLocationsMapBloc, this.locationRadiusConfigBloc);
 
   void handleOnSavePress() {
     _settingsService
@@ -91,88 +48,176 @@ class EditStopsLayoutState extends State<EditStopsLayout> {
         .then((result) => {
               if (result)
                 {
-                  _fToast.showToast(
-                      child: _successToast,
+                  Fluttertoast.showToast(
+                      msg: "Setting updated succesfully!",
                       gravity: ToastGravity.BOTTOM,
-                      toastDuration: Duration(seconds: 2)),
+                      toastLength: Toast.LENGTH_LONG,
+                      timeInSecForIosWeb: 3,
+                      backgroundColor: Colors.greenAccent,
+                      textColor: Colors.black),
                   Navigator.pop(context)
                 }
             });
   }
 
-  void handleOnCancelPress() {
-    Navigator.pop(context);
+  void handleOnCancelPress() => Navigator.pop(context);
+
+  Widget _handleMapLoadSuccess(
+      StopsLocationMapLoadSucess mapSuccessState, BuildContext context) {
+    locationRadiusConfigBloc
+        .add(LocationRadiusInitial(mapSuccessState.userRadiusSetting));
+    return BlocBuilder<LocationRadiusConfigBloc, int>(
+      builder: (builderContext, state) {
+        return Column(
+          children: [
+            Container(
+                child: SizedBox(
+                    height: 300,
+                    child:
+                        _buildMapFromStateWithRadius(mapSuccessState, state)),
+                alignment: Alignment.center,
+                color: appPageColor),
+            Slider(
+              value: state.toDouble(),
+              onChanged: (val) => {
+                _sliderValue = val,
+                if (val != mapSuccessState.userRadiusSetting)
+                  {_isSaveEnabled = true}
+                else if (val == mapSuccessState.userRadiusSetting)
+                  {_isSaveEnabled = false},
+                if (_previousChosenValue == 0)
+                  {locationRadiusConfigBloc.add(LocationRadiusInitial(state))}
+                else if (val > _previousChosenValue)
+                  {locationRadiusConfigBloc.add(LocationRadiusIncremented(100))}
+                else if (val < _previousChosenValue)
+                  {
+                    locationRadiusConfigBloc.add(LocationRadiusDecremented(100))
+                  },
+                _previousChosenValue = val.toInt()
+              },
+              min: 500,
+              max: 1500,
+              divisions: 10,
+              label: state.toString(),
+              inactiveColor: Color.fromRGBO(221, 160, 221, .6),
+            ),
+            Row(
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: handleOnCancelPress,
+                  child: Text(
+                    "Cancel",
+                    style:
+                        FontBuilder.buildCommonAppThemeFont(16, Colors.black87),
+                  ),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.cyanAccent)),
+                ),
+                ElevatedButton(
+                    onPressed: _isSaveEnabled ? handleOnSavePress : null,
+                    child: Text(
+                      "Save",
+                      style: FontBuilder.buildCommonAppThemeFont(
+                          16, Colors.black87),
+                    ),
+                    style: ButtonStyle(
+                        backgroundColor: _isSaveEnabled
+                            ? MaterialStateProperty.all<Color>(
+                                Colors.cyanAccent)
+                            : MaterialStateProperty.all<Color>(Colors.grey)))
+              ],
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            )
+          ],
+        );
+      },
+    );
   }
 
-  @override
-  void initState() {
-    _fToast.init(context);
-    super.initState();
+  GoogleMap _buildMapFromStateWithRadius(
+      StopsLocationMapLoadSucess mapSuccessState, int radius) {
+    Set<Marker> markers = {};
+    Set<Circle> radiusCircle = {};
+    var userLocation = mapSuccessState.userLocation;
+    var userLocationMarker = new Marker(
+        markerId: MarkerId("user_loc_marker"),
+        position: LatLng(mapSuccessState.userLocation.latitude,
+            mapSuccessState.userLocation.longitude));
+    markers.add(userLocationMarker);
+    radiusCircle.add(Circle(
+        center: LatLng(mapSuccessState.userLocation.latitude,
+            mapSuccessState.userLocation.longitude),
+        strokeWidth: 2,
+        fillColor: Color.fromRGBO(221, 160, 221, .6),
+        strokeColor: appPageColor,
+        radius: radius.toDouble(),
+        circleId: CircleId("selected_range")));
+    return GoogleMap(
+      mapType: MapType.normal,
+      initialCameraPosition: CameraPosition(
+          target: LatLng(userLocation.latitude, userLocation.longitude),
+          zoom: 14.0),
+      onMapCreated: (GoogleMapController controller) {
+        if (!_controller.isCompleted) {
+          _controller.complete(controller);
+          _mapController = controller;
+        }
+      },
+      markers: markers,
+      circles: radiusCircle,
+      zoomControlsEnabled: true,
+      zoomGesturesEnabled: true,
+      compassEnabled: true,
+    );
+  }
+
+  void _animateZoomOut(double radius) {
+    var zoomFactor = _getZoomFactor(radius);
+    _mapController.animateCamera(CameraUpdate.zoomBy(-zoomFactor));
+  }
+
+  void _animateZoomIn(double radius) {
+    var zoomFactor = _getZoomFactor(radius);
+    _mapController.animateCamera(CameraUpdate.zoomBy(zoomFactor));
+  }
+
+  double _getZoomFactor(double radius) {
+    if (radius < 300)
+      return 0.5;
+    else
+      return 0.2;
+  }
+
+  Widget getLoadingScreen() {
+    return Container(
+        child: SizedBox(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+                Color.fromRGBO(221, 160, 221, .6)),
+          ),
+          width: 60,
+          height: 60,
+        ),
+        alignment: Alignment.center,
+        color: appPageColor);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<CameraPosition>(
-        future: getCurrentPosition(),
-        builder:
-            (BuildContext context, AsyncSnapshot<CameraPosition> snapshot) {
-          Widget result;
-          if (snapshot.hasData && snapshot.data != null) {
-            result = Column(
-              children: <Widget>[
-                Container(
-                    child: SizedBox(
-                        height: 300,
-                        child: GoogleMap(
-                          mapType: MapType.normal,
-                          zoomControlsEnabled: true,
-                          initialCameraPosition: snapshot.data!,
-                          onMapCreated: (GoogleMapController controller) {
-                            _controller.complete(controller);
-                          },
-                          markers: _markers,
-                          circles: _circles,
-                        )),
-                    alignment: Alignment.center,
-                    color: appPageColor),
-                Slider(
-                  value: _sliderValue,
-                  onChanged: (val) => updateValues(val),
-                  min: 100,
-                  max: 500,
-                  divisions: 8,
-                  label: "$_sliderValue",
-                  inactiveColor: Color.fromRGBO(221, 160, 221, .6),
-                ),
-                Row(
-                  children: <Widget>[
-                    ElevatedButton(
-                        onPressed: handleOnCancelPress, child: Text("Cancel")),
-                    ElevatedButton(
-                        onPressed: _isSaveEnabled ? handleOnSavePress : null,
-                        child: Text("Save"))
-                  ],
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                )
-              ],
-              mainAxisAlignment: MainAxisAlignment.center,
+    stopsLocationsMapBloc
+        .add(StopsLocationMapRequested((ev, stopInfo) {}, true));
+    return BlocBuilder<StopsLocationsMapBloc, StopsLocationMapState>(
+        bloc: stopsLocationsMapBloc,
+        builder: (builderContext, state) {
+          if (state is StopsLocationMapLoadSucess) {
+            return Stack(
+              children: [_handleMapLoadSuccess(state, context)],
             );
-          } else if (snapshot.hasError) {
-            result = Text("SOMETHING WENT WRONG", textAlign: TextAlign.center);
-          } else {
-            result = Container(
-                child: SizedBox(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        Color.fromRGBO(221, 160, 221, .6)),
-                  ),
-                  width: 60,
-                  height: 60,
-                ),
-                alignment: Alignment.center,
-                color: appPageColor);
+          } else if (state is StopsLocationMapLoadFailed) {
+            return ErrorPage();
           }
-          return result;
+          return getLoadingScreen();
         });
   }
 }

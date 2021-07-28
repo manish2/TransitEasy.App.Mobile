@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:TransitEasy/blocs/locationradiusconfig_bloc.dart';
+import 'package:TransitEasy/blocs/stopslocationmap_bloc.dart';
 import 'package:TransitEasy/common/widgets/floating_menu.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar.dart';
 import 'package:TransitEasy/screens/settings/edit_stops/edit_stops_layout.dart';
 import 'package:TransitEasy/services/geolocation_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_conditional_rendering/conditional.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -43,6 +46,10 @@ class _EditStopsScreenState extends State<EditStopsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final StopsLocationsMapBloc mapBloc =
+        BlocProvider.of<StopsLocationsMapBloc>(context);
+    final LocationRadiusConfigBloc locationRadiusConfigBloc =
+        BlocProvider.of<LocationRadiusConfigBloc>(context);
     return new Scaffold(
         key: _scaffoldKey,
         body: Stack(children: <Widget>[
@@ -51,7 +58,7 @@ class _EditStopsScreenState extends State<EditStopsScreen> {
               conditionBuilder: (BuildContext context) =>
                   _isLocationPermissionEnabled,
               widgetBuilder: (BuildContext context) {
-                return EditStopsLayout();
+                return EditStopsLayout(mapBloc, locationRadiusConfigBloc);
               },
               fallbackBuilder: (BuildContext context) {
                 return Container(

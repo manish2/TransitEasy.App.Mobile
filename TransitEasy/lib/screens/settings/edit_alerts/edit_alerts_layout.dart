@@ -113,8 +113,8 @@ class EditAlertsLayoutState extends State<EditAlertsLayout> {
             return AlertDialog(
                 title: Text(
                     "When do you want me to alert you about your bus (how many stops away)?",
-                    style:
-                        FontBuilder.buildCommonAppThemeFont(18, Colors.white)),
+                    style: FontBuilder.buildCommonAppThemeFont(
+                        18, Colors.black87)),
                 content:
                     Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                   NumberPicker(
@@ -124,26 +124,27 @@ class EditAlertsLayoutState extends State<EditAlertsLayout> {
                       step: 1,
                       itemWidth: 50,
                       axis: Axis.horizontal,
+                      selectedTextStyle: TextStyle(color: Colors.purpleAccent),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white)),
+                          border: Border.all(color: Colors.black87)),
                       onChanged: (value) => handleOnValueChange(value))
                 ]),
                 actions: [
                   TextButton(
                       child: Text("OK",
                           style: FontBuilder.buildCommonAppThemeFont(
-                              18, Colors.white)),
+                              18, Colors.black87)),
                       onPressed: handleOnOkPressed)
                 ],
                 elevation: 24.0,
-                backgroundColor: Color.fromRGBO(221, 160, 221, .6));
+                backgroundColor: Colors.cyanAccent);
           } else {
             return Container(
                 child: SizedBox(
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        Color.fromRGBO(221, 160, 221, .6)),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.cyanAccent),
                   ),
                   width: 60,
                   height: 60,

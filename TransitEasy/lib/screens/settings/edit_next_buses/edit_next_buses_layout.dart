@@ -6,12 +6,12 @@ import 'package:numberpicker/numberpicker.dart';
 
 import '../../../constants.dart';
 
-class EditBusLocationLayout extends StatefulWidget {
+class EditNextBusesLayout extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => EditBusLocationLayoutState();
+  State<StatefulWidget> createState() => EditNextBusesLayoutState();
 }
 
-class EditBusLocationLayoutState extends State<EditBusLocationLayout> {
+class EditNextBusesLayoutState extends State<EditNextBusesLayout> {
   final SettingsService _settingsService = SettingsService();
   final FToast _fToast = FToast();
   final Widget _successToast = Container(
@@ -50,36 +50,31 @@ class EditBusLocationLayoutState extends State<EditBusLocationLayout> {
     ),
   );
 
-  late int _currlocationRefreshIntervalValue;
-  late int _savedlocationRefreshIntervalValue;
+  late int _currNextBuses;
+  late int _savedNextBuses;
   bool _isFirstTime = true;
 
   Future<int> getRefreshIntervalSetting() {
     if (_isFirstTime) {
       _settingsService.getUserSettingsAsync().then<int>((value) async {
-        _savedlocationRefreshIntervalValue = value.busLocationInterval;
-        _currlocationRefreshIntervalValue = _savedlocationRefreshIntervalValue;
-        return _currlocationRefreshIntervalValue;
+        _savedNextBuses = value.nextBuses;
+        _currNextBuses = _savedNextBuses;
+        return _currNextBuses;
       });
       _isFirstTime = false;
     }
-    return Future.delayed(
-        Duration.zero, () => _currlocationRefreshIntervalValue);
+    return Future.delayed(Duration.zero, () => _currNextBuses);
   }
 
   void handleOnValueChange(int value) {
     setState(() {
-      _currlocationRefreshIntervalValue = value;
+      _currNextBuses = value;
     });
   }
 
   void handleOnOkPressed() {
-    if (_savedlocationRefreshIntervalValue !=
-        _currlocationRefreshIntervalValue) {
-      _settingsService
-          .setBusLocationRefreshIntervalSecondsSetting(
-              _currlocationRefreshIntervalValue)
-          .then((value) {
+    if (_savedNextBuses != _currNextBuses) {
+      _settingsService.setNextBusesSearchSetting(_currNextBuses).then((value) {
         return value
             ? {
                 _fToast.showToast(
@@ -115,22 +110,22 @@ class EditBusLocationLayoutState extends State<EditBusLocationLayout> {
           if (snapshot.hasData && snapshot.data != null) {
             return AlertDialog(
                 title: Text(
-                    "When should I refresh the real-time bus location (in seconds)?",
+                    "How many buses do you want to know about for each route?",
                     style: FontBuilder.buildCommonAppThemeFont(
                         18, Colors.black87)),
                 content:
                     Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                   NumberPicker(
                       minValue: 1,
-                      maxValue: 120,
-                      value: _currlocationRefreshIntervalValue,
+                      maxValue: 6,
+                      value: _currNextBuses,
                       step: 1,
                       itemWidth: 50,
                       axis: Axis.horizontal,
-                      selectedTextStyle: TextStyle(color: Colors.purpleAccent),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.black87)),
+                      selectedTextStyle: TextStyle(color: Colors.purpleAccent),
                       onChanged: (value) => handleOnValueChange(value))
                 ]),
                 actions: [
