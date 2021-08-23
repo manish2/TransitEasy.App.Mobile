@@ -38,7 +38,6 @@ class _MyAppState extends State<MyApp> {
         UserSettingsRepository(SettingsService());
     final UserLocationBloc _userLocationBloc =
         UserLocationBloc(_userLocationRepository);
-    final StopsInfoBloc _stopsInfoBloc = StopsInfoBloc(_transitEasyRepository);
     return MultiBlocProvider(
         providers: [
           BlocProvider<NextBusScheduleBloc>(
@@ -51,7 +50,8 @@ class _MyAppState extends State<MyApp> {
               create: (BuildContext context) =>
                   PermissionsBloc(_geoLocationService)),
           BlocProvider<StopsInfoBloc>(
-              create: (BuildContext context) => _stopsInfoBloc),
+              create: (BuildContext context) =>
+                  StopsInfoBloc(_transitEasyRepository)),
           BlocProvider<StopsLocationsMapBloc>(
               create: (BuildContext context) => StopsLocationsMapBloc(
                   _userLocationRepository,

@@ -44,6 +44,7 @@ dependencies:
   equatable: ^2.0.2
   bloc_test: ^8.0.2
   sliding_up_panel: ^2.0.0+1
+  expandable: ^5.0.1
 
 dev_dependencies:
   build_runner: ^2.0.4

@@ -1,7 +1,10 @@
+import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar_item.dart';
 import 'package:TransitEasy/screens/settings/settings.dart';
+import 'package:TransitEasy/screens/stopnumbersearch/stopnumbersearch.dart';
 import 'package:TransitEasy/screens/stopslocation/stops_locations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NavBar extends StatelessWidget {
   //creates padding at top of sidenav for different viewports
@@ -11,6 +14,8 @@ class NavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final NextBusScheduleBloc _nextBusScheduleBloc =
+        BlocProvider.of<NextBusScheduleBloc>(context);
     return Drawer(
         child: Container(
             decoration: BoxDecoration(
@@ -35,7 +40,15 @@ class NavBar extends StatelessWidget {
                   title: 'Buses near me',
                   icon: Icons.location_pin,
                   showDivider: true,
-                  onTapListener: () {}),
+                  onTapListener: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                new StopNumberSearchScreen(
+                                    _nextBusScheduleBloc)));
+                  }),
               NavbarItem(
                   title: 'Enter Stop Number',
                   icon: Icons.search,

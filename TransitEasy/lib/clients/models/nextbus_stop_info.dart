@@ -6,9 +6,9 @@ part 'nextbus_stop_info.g.dart';
 class NextBusStopInfo {
   String routeDescription;
   String direction;
-  List<NextBusSchedule> nextBusStopInfo;
+  List<NextBusSchedule> schedules;
 
-  NextBusStopInfo(this.routeDescription, this.direction, this.nextBusStopInfo);
+  NextBusStopInfo(this.routeDescription, this.direction, this.schedules);
 
   factory NextBusStopInfo.fromJson(Map<String, dynamic> data) =>
       _$NextBusStopInfoFromJson(data);

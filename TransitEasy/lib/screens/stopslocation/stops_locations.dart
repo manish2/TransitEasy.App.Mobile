@@ -1,4 +1,5 @@
 import 'package:TransitEasy/blocs/events/permission/permissions_requested.dart';
+import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/permissions_bloc.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_load_success.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_state.dart';
@@ -21,13 +22,13 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final NavBar _navBar = new NavBar();
   final List<PermissionType> _requiredPermissions = [PermissionType.Location];
-  Widget loadWhenPermissionsReturned(
-      PermissionsLoadSuccess permissions, StopsLocationsMapBloc mapBloc) {
+  Widget loadWhenPermissionsReturned(PermissionsLoadSuccess permissions,
+      StopsLocationsMapBloc mapBloc, NextBusScheduleBloc nextBusScheduleBloc) {
     if (!permissions.permissionValues.containsKey(PermissionType.Location) ||
         permissions.permissionValues[PermissionType.Location] != true) {
-      return StopsLocationsLayout(mapBloc);
+      return StopsLocationsLayout(mapBloc, nextBusScheduleBloc);
     }
-    return StopsLocationsLayout(mapBloc);
+    return StopsLocationsLayout(mapBloc, nextBusScheduleBloc);
   }
 
   Widget getLoadingScreen() {
@@ -48,6 +49,8 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
   Widget build(BuildContext context) {
     final StopsLocationsMapBloc mapBloc =
         BlocProvider.of<StopsLocationsMapBloc>(context);
+    final NextBusScheduleBloc nextBusScheduleBloc =
+        BlocProvider.of<NextBusScheduleBloc>(context);
     final PermissionsBloc permissionBloc =
         BlocProvider.of<PermissionsBloc>(context);
     permissionBloc.add(PermissionsRequested(_requiredPermissions));
@@ -61,7 +64,8 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
               drawer: _navBar,
               body: Stack(
                 children: [
-                  loadWhenPermissionsReturned(state, mapBloc),
+                  loadWhenPermissionsReturned(
+                      state, mapBloc, nextBusScheduleBloc),
                   FloatingMenu(
                       onTap: () => _scaffoldKey.currentState!.openDrawer())
                 ],
