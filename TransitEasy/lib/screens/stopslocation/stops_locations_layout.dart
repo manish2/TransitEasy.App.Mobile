@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:TransitEasy/blocs/events/nextbuschedule/nextbusschedule_requested.dart';
 import 'package:TransitEasy/blocs/events/stopslocationmap/stopslocationmap_requested.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
@@ -21,6 +22,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -137,29 +140,30 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
         ),
       );
     }
-    return ListView(
-      children: nextBusStopInfo
-          .map((e) => Container(
-                decoration: BoxDecoration(
-                    color: Colors.cyanAccent,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    border: Border.all(color: Theme.of(context).primaryColor)),
-                child: ExpansionTile(
-                  title: Container(
-                    child: Text(e.routeDescription),
-                  ),
-                  children: e.schedules
-                      .map((schedule) => ListTile(
-                            title: Text(schedule.destination),
-                            subtitle: Text(
-                                "STATUS: ${getStatusString(schedule.scheduleStatus)}"),
-                            trailing: Text("${schedule.countdownInMin} min"),
-                          ))
-                      .toList(),
-                  childrenPadding: EdgeInsets.all(10.0),
+    List<Widget> nextBusList = nextBusStopInfo
+        .map((e) => Container(
+              decoration: BoxDecoration(
+                  color: Colors.cyanAccent,
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(color: Theme.of(context).primaryColor)),
+              child: ExpansionTile(
+                title: Container(
+                  child: Text(e.routeDescription),
                 ),
-              ))
-          .toList(),
+                children: e.schedules
+                    .map((schedule) => ListTile(
+                          title: Text(schedule.destination),
+                          subtitle: Text(
+                              "STATUS: ${getStatusString(schedule.scheduleStatus)}"),
+                          trailing: Text("${schedule.countdownInMin} min"),
+                        ))
+                    .toList(),
+                childrenPadding: EdgeInsets.all(10.0),
+              ),
+            ))
+        .toList();
+    return ListView(
+      children: nextBusList,
     );
   }
 
@@ -189,17 +193,41 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
       header: StreamBuilder<String>(
           stream: _stopInfoStreamController.stream,
           initialData: "   No stops selected!   ",
-          builder: (context, snapshot) => Container(
-              child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0)),
-                  color: Colors.cyanAccent,
-                  child: Text(
-                      snapshot.hasData
-                          ? snapshot.data!
-                          : "   No stops selected!   ",
-                      style: FontBuilder.buildCommonAppThemeFont(
-                          20, Colors.black87))))),
+          builder: (context, snapshot) => FocusedMenuHolder(
+                  menuWidth: MediaQuery.of(context).size.width * 0.50,
+                  blurSize: 5.0,
+                  menuBoxDecoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                  duration: Duration(milliseconds: 100),
+                  animateMenuItems: true,
+                  blurBackgroundColor: Colors.black54,
+                  openWithTap: false,
+                  menuOffset: 10.0,
+                  child: Container(
+                      child: Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0)),
+                          color: Colors.cyanAccent,
+                          child: Text(
+                              snapshot.hasData
+                                  ? snapshot.data!
+                                  : "   No stops selected!   ",
+                              style: FontBuilder.buildCommonAppThemeFont(
+                                  20, Colors.black87)))),
+                  onPressed: () => {},
+                  menuItems: [
+                    FocusedMenuItem(
+                        title: Text("Pin stop"),
+                        trailingIcon: Icon(
+                          Icons.push_pin,
+                          color: Colors.cyanAccent,
+                        ),
+                        onPressed: () => {
+                              developer.log('Pin Stop was pressed!',
+                                  name: 'my.app.category')
+                            })
+                  ])),
       panel: BlocBuilder<NextBusScheduleBloc, NextBusScheduleState>(
         bloc: nextBusScheduleBloc,
         builder: (context, state) {

@@ -59,7 +59,7 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
         bloc: permissionBloc,
         builder: (context, state) {
           if (state is PermissionsLoadSuccess) {
-            return new Scaffold(
+            return Scaffold(
               key: _scaffoldKey,
               drawer: _navBar,
               body: Stack(

@@ -7,41 +7,62 @@ class SettingsService {
   final int defaultBusLocationRefreshIntervalSeconds = 5;
   final int defaultNextBuses = 2;
 
+  final String _stopsSearchRadiusMetersSettingKey = 'stopsSearchRadiusMeters';
+  final String _busAlertTriggerSettingKey = 'busAlertTrigger';
+  final String _busLocationRefreshIntervalSecondsSettingKey =
+      'busLocationRefreshIntervalSeconds';
+  final String _nextBusesSearchSettingKey = 'nextBusesSearch';
+  final String _pinnedStopsSettingKey = 'pinnedStops';
+
   Future<UserSettings> getUserSettingsAsync() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var stopsSearchRadiusMeters = prefs.getInt('stopsSearchRadiusMeters') ??
-        defaultStopsSearchRadiusMeters;
+    var stopsSearchRadiusMeters =
+        prefs.getInt(_stopsSearchRadiusMetersSettingKey) ??
+            defaultStopsSearchRadiusMeters;
     if (stopsSearchRadiusMeters < 500)
       stopsSearchRadiusMeters = defaultStopsSearchRadiusMeters;
     var busAlertTrigger =
-        prefs.getInt('busAlertTrigger') ?? defaultBusAlertTrigger;
+        prefs.getInt(_busAlertTriggerSettingKey) ?? defaultBusAlertTrigger;
     var busLocationRefreshIntervalSeconds =
-        prefs.getInt('busLocationRefreshIntervalSeconds') ??
+        prefs.getInt(_busLocationRefreshIntervalSecondsSettingKey) ??
             defaultBusLocationRefreshIntervalSeconds;
-    var nextBuses = prefs.getInt('nextBusesSearch') ?? defaultNextBuses;
+    var nextBuses =
+        prefs.getInt(_nextBusesSearchSettingKey) ?? defaultNextBuses;
     return new UserSettings(stopsSearchRadiusMeters, busAlertTrigger,
         busLocationRefreshIntervalSeconds, nextBuses);
   }
 
   Future<bool> setStopsSearchRadiusMetersSetting(int searchRadiusMeters) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.setInt('stopsSearchRadiusMeters', searchRadiusMeters);
+    return prefs.setInt(_stopsSearchRadiusMetersSettingKey, searchRadiusMeters);
   }
 
   Future<bool> setBusLocationRefreshIntervalSecondsSetting(
       int busLocationInterval) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.setInt(
-        'busLocationRefreshIntervalSeconds', busLocationInterval);
+        _busLocationRefreshIntervalSecondsSettingKey, busLocationInterval);
   }
 
   Future<bool> setbusAlertTriggerSetting(int busAlertTrigger) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.setInt('busAlertTrigger', busAlertTrigger);
+    return prefs.setInt(_busAlertTriggerSettingKey, busAlertTrigger);
   }
 
   Future<bool> setNextBusesSearchSetting(int nextBuses) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.setInt('nextBusesSearch', nextBuses);
+    return prefs.setInt(_nextBusesSearchSettingKey, nextBuses);
+  }
+
+  Future<bool> addPinnedStop(String stopNo) async {
+    final prefs = await SharedPreferences.getInstance();
+    var pinnedStopsList = await getPinnedStopsCsv();
+    pinnedStopsList.add(stopNo);
+    return prefs.setStringList(_pinnedStopsSettingKey, pinnedStopsList);
+  }
+
+  Future<List<String>> getPinnedStopsCsv() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_pinnedStopsSettingKey) ?? [];
   }
 }

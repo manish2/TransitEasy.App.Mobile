@@ -3,6 +3,9 @@ import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_in_progress.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_success.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_state.dart';
+import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
+import 'package:TransitEasy/clients/models/nextbus_schedule_status.dart';
+import 'package:TransitEasy/clients/models/nextbus_stop_info.dart';
 import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:TransitEasy/common/widgets/floating_menu.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar.dart';
@@ -15,7 +18,7 @@ import '../../constants.dart';
 class StopNumberSearchScreen extends StatelessWidget {
   final NavBar _navBar = new NavBar();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final NextBusScheduleBloc _nextBusScheduleBloc;
+  final StopNumberSearchBloc _nextBusScheduleBloc;
   final ButtonStyle style = ElevatedButton.styleFrom(
       primary: Colors.cyanAccent,
       onPrimary: Colors.black87,
@@ -37,9 +40,65 @@ class StopNumberSearchScreen extends StatelessWidget {
     );
   }
 
+  Widget getNextBusSchedulesList(
+      List<NextBusStopInfo>? nextBusStopInfo, BuildContext context) {
+    if (nextBusStopInfo == null || nextBusStopInfo.isEmpty) {
+      return Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+            color: Colors.cyanAccent,
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            border: Border.all(color: Theme.of(context).primaryColor)),
+        child: Text(
+          "No data available for this stop",
+          style: FontBuilder.buildCommonAppThemeFont(20, Colors.black87),
+        ),
+      );
+    }
+    return Expanded(
+        child: SizedBox(
+            height: 200.0,
+            child: ListView(
+              children: nextBusStopInfo
+                  .map((e) => Container(
+                        decoration: BoxDecoration(
+                            color: Colors.cyanAccent,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            border: Border.all(
+                                color: Theme.of(context).primaryColor)),
+                        child: ExpansionTile(
+                          title: Container(
+                            child: Text(e.routeDescription),
+                          ),
+                          children: e.schedules
+                              .map((schedule) => ListTile(
+                                    title: Text(schedule.destination),
+                                    subtitle: Text(
+                                        "STATUS: ${getStatusString(schedule.scheduleStatus)}"),
+                                    trailing:
+                                        Text("${schedule.countdownInMin} min"),
+                                  ))
+                              .toList(),
+                          childrenPadding: EdgeInsets.all(10.0),
+                        ),
+                      ))
+                  .toList(),
+            )));
+  }
+
+  String getStatusString(NextBusScheduleStatus status) {
+    if (status == NextBusScheduleStatus.ONTIME)
+      return "ON TIME";
+    else if (status == NextBusScheduleStatus.AHEAD)
+      return "AHEAD";
+    else
+      return "DELAYED";
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
         body: Stack(children: <Widget>[
           GestureDetector(
@@ -91,7 +150,7 @@ class StopNumberSearchScreen extends StatelessWidget {
                             },
                             child: const Text('Enter'),
                           ),
-                          BlocBuilder<NextBusScheduleBloc,
+                          BlocBuilder<StopNumberSearchBloc,
                                   NextBusScheduleState>(
                               bloc: _nextBusScheduleBloc,
                               builder: (context, state) {
@@ -99,7 +158,8 @@ class StopNumberSearchScreen extends StatelessWidget {
                                   return getLoadingScreen();
                                 } else if (state
                                     is NextBusScheduleLoadSuccess) {
-                                  return Container();
+                                  return getNextBusSchedulesList(
+                                      state.nextBusStopInfo, context);
                                 } else {
                                   return Container();
                                 }

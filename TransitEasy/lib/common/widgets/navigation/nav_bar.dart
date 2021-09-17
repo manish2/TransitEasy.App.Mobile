@@ -1,4 +1,5 @@
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
+import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar_item.dart';
 import 'package:TransitEasy/screens/settings/settings.dart';
 import 'package:TransitEasy/screens/stopnumbersearch/stopnumbersearch.dart';
@@ -16,6 +17,9 @@ class NavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final NextBusScheduleBloc _nextBusScheduleBloc =
         BlocProvider.of<NextBusScheduleBloc>(context);
+    final StopNumberSearchBloc _stopNumberSearchBloc =
+        BlocProvider.of<StopNumberSearchBloc>(context);
+
     return Drawer(
         child: Container(
             decoration: BoxDecoration(
@@ -40,20 +44,19 @@ class NavBar extends StatelessWidget {
                   title: 'Buses near me',
                   icon: Icons.location_pin,
                   showDivider: true,
+                  onTapListener: () {}),
+              NavbarItem(
+                  title: 'Enter Stop Number',
+                  icon: Icons.search,
+                  showDivider: true,
                   onTapListener: () {
                     Navigator.of(context).pop();
                     Navigator.push(
                         context,
                         new MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                new StopNumberSearchScreen(
-                                    _nextBusScheduleBloc)));
+                                StopNumberSearchScreen(_stopNumberSearchBloc)));
                   }),
-              NavbarItem(
-                  title: 'Enter Stop Number',
-                  icon: Icons.search,
-                  showDivider: true,
-                  onTapListener: () {}),
               NavbarItem(
                   title: 'Bus Schedules',
                   icon: Icons.directions_bus,
@@ -92,6 +95,7 @@ class NavBar extends StatelessWidget {
                               new SettingsScreen()));
                 },
               ),
+              Container(child: Text("Pinned Stops"))
             ])));
   }
 }

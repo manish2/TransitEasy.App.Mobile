@@ -2,6 +2,7 @@ import 'package:TransitEasy/blocs/blocs.dart';
 import 'package:TransitEasy/blocs/locationradiusconfig_bloc.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/permissions_bloc.dart';
+import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/blocs/stopslocationmap_bloc.dart';
 import 'package:TransitEasy/blocs/userlocation_bloc.dart';
 import 'package:TransitEasy/blocs/usersettings_bloc.dart';
@@ -40,6 +41,9 @@ class _MyAppState extends State<MyApp> {
         UserLocationBloc(_userLocationRepository);
     return MultiBlocProvider(
         providers: [
+          BlocProvider<StopNumberSearchBloc>(
+              create: (BuildContext context) => StopNumberSearchBloc(
+                  _userSettingsRepository, _transitEasyRepository)),
           BlocProvider<NextBusScheduleBloc>(
               create: (BuildContext context) => NextBusScheduleBloc(
                   _userSettingsRepository, _transitEasyRepository)),
