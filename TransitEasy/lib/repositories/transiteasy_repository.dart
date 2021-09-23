@@ -1,5 +1,6 @@
 import 'package:TransitEasy/clients/models/nearby_stops_result.dart';
 import 'package:TransitEasy/clients/models/nextbus_schedule_result.dart';
+import 'package:TransitEasy/clients/models/service_alert_result.dart';
 import 'package:TransitEasy/clients/transiteasy_api_client.dart';
 
 class TransitEasyRepository {
@@ -16,5 +17,8 @@ class TransitEasyRepository {
       int stopNumber, int numNextBuses) async {
     return await transityEasyApiClient.getNextBusSchedules(
         stopNumber, numNextBuses);
+  }
+  Future<ServiceAlertResult> getServiceAlerts() async {
+    return await transityEasyApiClient.getServiceAlerts(); 
   }
 }

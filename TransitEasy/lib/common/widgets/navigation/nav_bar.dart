@@ -1,6 +1,7 @@
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar_item.dart';
+import 'package:TransitEasy/screens/servicealerts/service_alerts.dart';
 import 'package:TransitEasy/screens/settings/settings.dart';
 import 'package:TransitEasy/screens/stopnumbersearch/stopnumbersearch.dart';
 import 'package:TransitEasy/screens/stopslocation/stops_locations.dart';
@@ -81,7 +82,10 @@ class NavBar extends StatelessWidget {
                   title: 'Service Alerts',
                   icon: Icons.info,
                   showDivider: true,
-                  onTapListener: () {}),
+                  onTapListener: () {
+                    Navigator.of(context).pop(); 
+                    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new ServiceAlertsScreen()));
+                  }),
               NavbarItem(
                 title: 'Settings',
                 icon: Icons.settings,

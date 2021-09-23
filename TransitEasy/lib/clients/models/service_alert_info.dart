@@ -9,4 +9,7 @@ class ServiceAlertInfo {
   List<ServiceAlert> alerts;
 
   ServiceAlertInfo(this.count, this.alerts);
+
+  factory ServiceAlertInfo.fromJson(Map<String, dynamic> json) => _$ServiceAlertInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$ServiceAlertInfoToJson(this);
 }

@@ -31,7 +31,7 @@ class NextBusScheduleBloc
             .getNextBusSchedules(stopNumber, numBuses);
         yield NextBusScheduleLoadSuccess(nextBusScheduleInfo.nextBusStopInfo);
       }
-    } catch (Exception) {
+    } catch (exception) {
       yield NextBusScheduleLoadFailed();
     }
   }

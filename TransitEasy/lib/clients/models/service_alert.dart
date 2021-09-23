@@ -14,4 +14,7 @@ class ServiceAlert {
 
   ServiceAlert(this.alertId, this.routeId, this.routeLongName, this.effect,
       this.alertText, this.alertHeader, this.alertDescription);
+  
+  factory ServiceAlert.fromJson(Map<String, dynamic> json) => _$ServiceAlertFromJson(json);
+  Map<String, dynamic> toJson() => _$ServiceAlertToJson(this);
 }

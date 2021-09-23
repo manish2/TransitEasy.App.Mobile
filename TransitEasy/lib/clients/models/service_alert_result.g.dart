@@ -9,7 +9,8 @@ part of 'service_alert_result.dart';
 ServiceAlertResult _$ServiceAlertResultFromJson(Map<String, dynamic> json) {
   return ServiceAlertResult(
     (json['busAlerts'] as Map<String, dynamic>).map(
-      (k, e) => MapEntry(k, ServiceAlert.fromJson(e as Map<String, dynamic>)),
+      (k, e) =>
+          MapEntry(k, ServiceAlertInfo.fromJson(e as Map<String, dynamic>)),
     ),
   );
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:TransitEasy/clients/models/nearby_stops_result.dart';
 import 'package:TransitEasy/clients/models/nextbus_schedule_result.dart';
+import 'package:TransitEasy/clients/models/service_alert_result.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
 
@@ -42,5 +43,18 @@ class TransitEasyApiClient {
         json.decode(nextBusSchedulesResponse.body) as Map<String, dynamic>;
     var nextBusSchedulesResult = NextBusScheduleResult.fromJson(parsedObj);
     return nextBusSchedulesResult;
+  }
+
+  Future<ServiceAlertResult> getServiceAlerts() async {
+    var uri = Uri.https(baseUrl, '/api/ServiceAlerts/servicealerts');
+    var serviceAlertsResponse = await http.get(uri).timeout(const Duration(seconds: 5)); 
+    developer.log('response from $uri \n' + serviceAlertsResponse.body, name: 'transiteasy.clients.transiteasy_api_client');
+
+    if(serviceAlertsResponse.statusCode != 200) {
+      throw Exception('error getting service alerts'); 
+    }
+    var parsedObj = json.decode(serviceAlertsResponse.body) as Map<String, dynamic>;
+    var serviceAlertsResult = ServiceAlertResult.fromJson(parsedObj); 
+    return serviceAlertsResult; 
   }
 }
