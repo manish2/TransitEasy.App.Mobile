@@ -2,6 +2,7 @@ import 'package:TransitEasy/blocs/blocs.dart';
 import 'package:TransitEasy/blocs/locationradiusconfig_bloc.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/permissions_bloc.dart';
+import 'package:TransitEasy/blocs/servicealerts_bloc.dart';
 import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/blocs/stopslocationmap_bloc.dart';
 import 'package:TransitEasy/blocs/userlocation_bloc.dart';
@@ -65,7 +66,10 @@ class _MyAppState extends State<MyApp> {
               create: (BuildContext context) => _userLocationBloc),
           BlocProvider(
               create: (BuildContext context) =>
-                  UserSettingsBloc(_userSettingsRepository))
+                  UserSettingsBloc(_userSettingsRepository)),
+          BlocProvider(
+              create: (BuildContext context) =>
+                  ServiceAlertsBloc(_transitEasyRepository))
         ],
         child: MaterialApp(
           title: 'TransitEasy',

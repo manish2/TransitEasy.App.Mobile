@@ -1,4 +1,5 @@
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
+import 'package:TransitEasy/blocs/servicealerts_bloc.dart';
 import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar_item.dart';
 import 'package:TransitEasy/screens/servicealerts/service_alerts.dart';
@@ -20,6 +21,8 @@ class NavBar extends StatelessWidget {
         BlocProvider.of<NextBusScheduleBloc>(context);
     final StopNumberSearchBloc _stopNumberSearchBloc =
         BlocProvider.of<StopNumberSearchBloc>(context);
+    final ServiceAlertsBloc _serviceAlertsBloc =
+        BlocProvider.of<ServiceAlertsBloc>(context);
 
     return Drawer(
         child: Container(
@@ -83,8 +86,12 @@ class NavBar extends StatelessWidget {
                   icon: Icons.info,
                   showDivider: true,
                   onTapListener: () {
-                    Navigator.of(context).pop(); 
-                    Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context) => new ServiceAlertsScreen()));
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                new ServiceAlertsScreen(_serviceAlertsBloc)));
                   }),
               NavbarItem(
                 title: 'Settings',
@@ -99,7 +106,6 @@ class NavBar extends StatelessWidget {
                               new SettingsScreen()));
                 },
               ),
-              Container(child: Text("Pinned Stops"))
             ])));
   }
 }
