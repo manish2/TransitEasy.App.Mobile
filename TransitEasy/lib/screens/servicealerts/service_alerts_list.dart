@@ -67,6 +67,7 @@ class _ServiceAlertsListState extends State<ServiceAlertsList> {
       },
       children: _items
           .map((e) => new ExpansionPanel(
+              backgroundColor: Colors.cyanAccent,
               headerBuilder: (buildContext, isExpanded) {
                 return e.header;
               },

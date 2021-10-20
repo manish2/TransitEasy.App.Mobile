@@ -8,8 +8,8 @@ import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/common/widgets/floating_menu.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar.dart';
 import 'package:TransitEasy/constants.dart';
-import 'package:TransitEasy/screens/servicealerts/service_alert_item.dart';
-import 'package:TransitEasy/screens/servicealerts/service_alerts_list.dart';
+import 'package:TransitEasy/screens/servicealerts/service_alert_card.dart';
+import 'package:TransitEasy/screens/servicealerts/service_alerts_count.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,32 +35,43 @@ class ServiceAlertsScreen extends StatelessWidget {
         color: appPageColor);
   }
 
-  Widget buildServiceAlerts(ServiceAlertResult apiResult) {
-    List<ServiceAlertItem> busItems = [];
+  List<Widget> buildAlertsWidget(ServiceAlertResult apiResult) {
+    List<Widget> busAlerts = [];
     apiResult.busAlerts.forEach((routeName, alertInfo) {
-      busItems.add(new ServiceAlertItem(
-          false,
-          Text(routeName),
-          new ServiceAlertsList(alertInfo.alerts
-              .map((e) => new ServiceAlertItem(
-                  false, Text(e.alertHeader), new Container()))
-              .toList())));
+      busAlerts.add(ExpansionTile(
+        trailing: ServiceAlertsCount(),
+        title: Text(routeName),
+        children: alertInfo.alerts
+            .map((ai) => ServiceAlertCard(ai.alertHeader, ai.alertDescription))
+            .toList(),
+      ));
     });
+    return busAlerts;
+  }
+
+  Widget buildServiceAlerts(ServiceAlertResult apiResult) {
     return ListView(
       children: [
         Padding(padding: EdgeInsets.fromLTRB(0, 80, 0, 0)),
-        ExpansionPanelList(
-          children: [
-            new ExpansionPanel(
-                backgroundColor: Colors.cyanAccent,
-                headerBuilder: (BuildContext context, bool isExpanded) {
-                  return ListTile(
-                    title: Text("Bus"),
-                  );
-                },
-                body: new ServiceAlertsList(busItems))
-          ],
-        )
+        ExpansionTile(
+            collapsedBackgroundColor: Colors.cyanAccent,
+            backgroundColor: Colors.cyanAccent,
+            title: Text("Bus"),
+            children: buildAlertsWidget(apiResult)),
+        SizedBox(
+          height: 20,
+        ),
+        ExpansionTile(
+            collapsedBackgroundColor: Colors.cyanAccent,
+            backgroundColor: Colors.cyanAccent,
+            title: Text("Skytrain")),
+        SizedBox(
+          height: 20,
+        ),
+        ExpansionTile(
+            collapsedBackgroundColor: Colors.cyanAccent,
+            backgroundColor: Colors.cyanAccent,
+            title: Text("Seabus"))
       ],
     );
   }

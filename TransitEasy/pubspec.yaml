@@ -46,6 +46,8 @@ dependencies:
   sliding_up_panel: ^2.0.0+1
   expandable: ^5.0.1
   focused_menu: ^1.0.5
+  accordion: ^2.1.1
+  grpc: ^3.0.2
 
 dev_dependencies:
   build_runner: ^2.0.4
