@@ -25,7 +25,7 @@ class LocationRadiusConfigBloc extends Bloc<LocationRadiusEvent, int> {
         _configuredRadius -= event.decrementFactor;
       }
       yield _configuredRadius;
-    } catch (Exception) {
+    } catch (_) {
       yield -1;
     }
   }

@@ -1,4 +1,3 @@
-import 'package:TransitEasy/clients/models/service_alert_result.dart';
 import 'package:TransitEasy/screens/servicealerts/service_alert_item.dart';
 import 'package:flutter/material.dart';
 

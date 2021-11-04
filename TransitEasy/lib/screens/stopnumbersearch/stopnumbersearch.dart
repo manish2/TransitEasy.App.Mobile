@@ -1,5 +1,4 @@
 import 'package:TransitEasy/blocs/events/nextbuschedule/nextbusschedule_requested.dart';
-import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_in_progress.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_success.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_state.dart';

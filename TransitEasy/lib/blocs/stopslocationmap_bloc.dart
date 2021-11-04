@@ -38,7 +38,7 @@ class StopsLocationsMapBloc
       }
       yield StopsLocationMapLoadSucess(
           locations, userLocation, userSettings.searchRadiusKm);
-    } catch (Exception) {
+    } catch (_) {
       yield StopsLocationMapLoadFailed();
     }
   }

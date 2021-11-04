@@ -189,7 +189,7 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
             context: context, builder: (context) => StopDetails(stopInfo)),
         false));
     return SlidingUpPanel(
-      maxHeight: 800,
+      maxHeight: 700,
       header: StreamBuilder<String>(
           stream: _stopInfoStreamController.stream,
           initialData: "   No stops selected!   ",

@@ -1,26 +1,28 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'nearby_stops_result.dart';
+part of 'vehicles_location_result.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-NearbyStopsResult _$NearbyStopsResultFromJson(Map<String, dynamic> json) {
-  return NearbyStopsResult(
+VehiclesLocationResult _$VehiclesLocationResultFromJson(
+    Map<String, dynamic> json) {
+  return VehiclesLocationResult(
     _$enumDecode(_$ApiResponseStatusEnumMap, json['responseStatus'],
         unknownValue: ApiResponseStatus.Success),
-    (json['nearbyStopsInfo'] as List<dynamic>?)
-        ?.map((e) => StopInfo.fromJson(e as Map<String, dynamic>))
+    (json['vehicleLocations'] as List<dynamic>)
+        .map((e) => VehiclesLocation.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 }
 
-Map<String, dynamic> _$NearbyStopsResultToJson(NearbyStopsResult instance) =>
+Map<String, dynamic> _$VehiclesLocationResultToJson(
+        VehiclesLocationResult instance) =>
     <String, dynamic>{
       'responseStatus': _$ApiResponseStatusEnumMap[instance.responseStatus],
-      'nearbyStopsInfo':
-          instance.nearbyStopsInfo?.map((e) => e.toJson()).toList(),
+      'vehicleLocations':
+          instance.vehicleLocations.map((e) => e.toJson()).toList(),
     };
 
 K _$enumDecode<K, V>(

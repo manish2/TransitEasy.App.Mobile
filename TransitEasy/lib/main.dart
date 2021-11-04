@@ -1,4 +1,5 @@
 import 'package:TransitEasy/blocs/blocs.dart';
+import 'package:TransitEasy/blocs/busrouteslist_bloc.dart';
 import 'package:TransitEasy/blocs/locationradiusconfig_bloc.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/permissions_bloc.dart';
@@ -69,7 +70,10 @@ class _MyAppState extends State<MyApp> {
                   UserSettingsBloc(_userSettingsRepository)),
           BlocProvider(
               create: (BuildContext context) =>
-                  ServiceAlertsBloc(_transitEasyRepository))
+                  ServiceAlertsBloc(_transitEasyRepository)),
+          BlocProvider(
+              create: (BuildContext context) =>
+                  BusRoutesListBloc(_transitEasyRepository)),
         ],
         child: MaterialApp(
           title: 'TransitEasy',

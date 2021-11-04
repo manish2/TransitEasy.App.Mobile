@@ -1,26 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'nearby_stops_result.dart';
+part of 'routes_info_result.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-NearbyStopsResult _$NearbyStopsResultFromJson(Map<String, dynamic> json) {
-  return NearbyStopsResult(
+RoutesInfoResult _$RoutesInfoResultFromJson(Map<String, dynamic> json) {
+  return RoutesInfoResult(
     _$enumDecode(_$ApiResponseStatusEnumMap, json['responseStatus'],
         unknownValue: ApiResponseStatus.Success),
-    (json['nearbyStopsInfo'] as List<dynamic>?)
-        ?.map((e) => StopInfo.fromJson(e as Map<String, dynamic>))
+    (json['routesInfo'] as List<dynamic>?)
+        ?.map((e) => RouteInfo.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 }
 
-Map<String, dynamic> _$NearbyStopsResultToJson(NearbyStopsResult instance) =>
+Map<String, dynamic> _$RoutesInfoResultToJson(RoutesInfoResult instance) =>
     <String, dynamic>{
       'responseStatus': _$ApiResponseStatusEnumMap[instance.responseStatus],
-      'nearbyStopsInfo':
-          instance.nearbyStopsInfo?.map((e) => e.toJson()).toList(),
+      'routesInfo': instance.routesInfo?.map((e) => e.toJson()).toList(),
     };
 
 K _$enumDecode<K, V>(

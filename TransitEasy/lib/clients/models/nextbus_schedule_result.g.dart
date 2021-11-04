@@ -54,4 +54,5 @@ K _$enumDecode<K, V>(
 const _$ApiResponseStatusEnumMap = {
   ApiResponseStatus.Success: 0,
   ApiResponseStatus.NoStopsNearLocation: 1,
+  ApiResponseStatus.NoVehiclesAvailable: 2,
 };

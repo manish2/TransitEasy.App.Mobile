@@ -3,6 +3,8 @@ import 'package:TransitEasy/constants.dart';
 import 'package:flutter/material.dart';
 
 class ErrorPage extends StatelessWidget {
+  final String errorMessage;
+  ErrorPage([this.errorMessage = 'Sorry, we encountered an unexpected error!']);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -33,7 +35,7 @@ class ErrorPage extends StatelessWidget {
                       50, Colors.cyanAccent),
                 ),
                 Text(
-                  'Sorry, we encountered an unexpected error!',
+                  errorMessage,
                   textAlign: TextAlign.center,
                   style: FontBuilder.buildCommonAppThemeFont(
                       30, Colors.cyanAccent),

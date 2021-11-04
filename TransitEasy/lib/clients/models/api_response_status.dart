@@ -4,5 +4,7 @@ enum ApiResponseStatus {
   @JsonValue(0)
   Success,
   @JsonValue(1)
-  NoStopsNearLocation
+  NoStopsNearLocation,
+  @JsonValue(2)
+  NoVehiclesAvailable,
 }

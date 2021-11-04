@@ -77,7 +77,6 @@ class ServiceAlertsScreen extends StatelessWidget {
   }
 
   Widget buildServiceAlertsList(ServiceAlertResult apiResult) {
-    List<Widget> result = [];
     List<ExpansionPanel> test = [];
     List<ExpansionPanel> busResult = [];
 

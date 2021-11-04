@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:TransitEasy/clients/models/nearby_stops_result.dart';
 import 'package:TransitEasy/clients/models/nextbus_schedule_result.dart';
+import 'package:TransitEasy/clients/models/routes_info_result.dart';
 import 'package:TransitEasy/clients/models/service_alert_result.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
 
 class TransitEasyApiClient {
-  static const baseUrl = "transiteasyapi2.azurewebsites.net";
+  static const baseUrl = "transiteasy3.azurewebsites.net";
 
   Future<NearbyStopsResult> getNearbyStopsInfo(
       double currLat, double currLong, int radius) async {
@@ -47,14 +48,29 @@ class TransitEasyApiClient {
 
   Future<ServiceAlertResult> getServiceAlerts() async {
     var uri = Uri.https(baseUrl, '/api/ServiceAlerts/servicealerts');
-    var serviceAlertsResponse = await http.get(uri).timeout(const Duration(seconds: 5)); 
-    developer.log('response from $uri \n' + serviceAlertsResponse.body, name: 'transiteasy.clients.transiteasy_api_client');
+    var serviceAlertsResponse =
+        await http.get(uri).timeout(const Duration(seconds: 5));
+    developer.log('response from $uri \n' + serviceAlertsResponse.body,
+        name: 'transiteasy.clients.transiteasy_api_client');
 
-    if(serviceAlertsResponse.statusCode != 200) {
-      throw Exception('error getting service alerts'); 
+    if (serviceAlertsResponse.statusCode != 200) {
+      throw Exception('error getting service alerts');
     }
-    var parsedObj = json.decode(serviceAlertsResponse.body) as Map<String, dynamic>;
-    var serviceAlertsResult = ServiceAlertResult.fromJson(parsedObj); 
-    return serviceAlertsResult; 
+    var parsedObj =
+        json.decode(serviceAlertsResponse.body) as Map<String, dynamic>;
+    var serviceAlertsResult = ServiceAlertResult.fromJson(parsedObj);
+    return serviceAlertsResult;
+  }
+
+  Future<RoutesInfoResult> getRoutes() async {
+    var uri = Uri.https(baseUrl, '/api/Routes');
+    var routesInfoResponse =
+        await http.get(uri).timeout(const Duration(seconds: 5));
+    developer.log('response from $uri \n' + routesInfoResponse.body,
+        name: 'transiteasy.clients.transiteasy_api_client');
+    var parsedResponse =
+        json.decode(routesInfoResponse.body) as Map<String, dynamic>;
+    var routesInfoResult = RoutesInfoResult.fromJson(parsedResponse);
+    return routesInfoResult;
   }
 }

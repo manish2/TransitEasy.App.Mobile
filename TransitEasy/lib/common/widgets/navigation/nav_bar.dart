@@ -1,4 +1,5 @@
-import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
+import 'package:TransitEasy/blocs/busrouteslist_bloc.dart';
+import 'package:TransitEasy/blocs/permissions_bloc.dart';
 import 'package:TransitEasy/blocs/servicealerts_bloc.dart';
 import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/common/widgets/navigation/nav_bar_item.dart';
@@ -6,8 +7,10 @@ import 'package:TransitEasy/screens/servicealerts/service_alerts.dart';
 import 'package:TransitEasy/screens/settings/settings.dart';
 import 'package:TransitEasy/screens/stopnumbersearch/stopnumbersearch.dart';
 import 'package:TransitEasy/screens/stopslocation/stops_locations.dart';
+import 'package:TransitEasy/screens/trackmybus/track_my_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:developer' as developer;
 
 class NavBar extends StatelessWidget {
   //creates padding at top of sidenav for different viewports
@@ -17,13 +20,14 @@ class NavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NextBusScheduleBloc _nextBusScheduleBloc =
-        BlocProvider.of<NextBusScheduleBloc>(context);
     final StopNumberSearchBloc _stopNumberSearchBloc =
         BlocProvider.of<StopNumberSearchBloc>(context);
     final ServiceAlertsBloc _serviceAlertsBloc =
         BlocProvider.of<ServiceAlertsBloc>(context);
-
+    final BusRoutesListBloc _busRoutesListBloc =
+        BlocProvider.of<BusRoutesListBloc>(context);
+    final PermissionsBloc _permissionBloc =
+        BlocProvider.of<PermissionsBloc>(context);
     return Drawer(
         child: Container(
             decoration: BoxDecoration(
@@ -36,6 +40,9 @@ class NavBar extends StatelessWidget {
                 icon: Icons.bus_alert,
                 showDivider: true,
                 onTapListener: () {
+                  Navigator.pop(context);
+                  developer.log("CAN POP STOPS NEAR ME: " +
+                      Navigator.canPop(context).toString());
                   Navigator.of(context).pop();
                   Navigator.push(
                       context,
@@ -45,10 +52,19 @@ class NavBar extends StatelessWidget {
                 },
               ),
               NavbarItem(
-                  title: 'Buses near me',
+                  title: 'Track My Bus',
                   icon: Icons.location_pin,
                   showDivider: true,
-                  onTapListener: () {}),
+                  onTapListener: () {
+                    developer.log("CAN POP Track My Bus: " +
+                        Navigator.of(context).canPop().toString());
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => TrackMyBusScreen(
+                                _busRoutesListBloc, _permissionBloc)));
+                  }),
               NavbarItem(
                   title: 'Enter Stop Number',
                   icon: Icons.search,
