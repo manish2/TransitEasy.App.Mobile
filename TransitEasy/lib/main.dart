@@ -17,6 +17,7 @@ import 'package:TransitEasy/services/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/observers/default_bloc_observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() {
   Bloc.observer = DefaultBlocObserver();
@@ -41,48 +42,52 @@ class _MyAppState extends State<MyApp> {
         UserSettingsRepository(SettingsService());
     final UserLocationBloc _userLocationBloc =
         UserLocationBloc(_userLocationRepository);
-    return MultiBlocProvider(
-        providers: [
-          BlocProvider<StopNumberSearchBloc>(
-              create: (BuildContext context) => StopNumberSearchBloc(
-                  _userSettingsRepository, _transitEasyRepository)),
-          BlocProvider<NextBusScheduleBloc>(
-              create: (BuildContext context) => NextBusScheduleBloc(
-                  _userSettingsRepository, _transitEasyRepository)),
-          BlocProvider<LocationRadiusConfigBloc>(
-              create: (BuildContext context) =>
-                  LocationRadiusConfigBloc(SettingsService())),
-          BlocProvider<PermissionsBloc>(
-              create: (BuildContext context) =>
-                  PermissionsBloc(_geoLocationService)),
-          BlocProvider<StopsInfoBloc>(
-              create: (BuildContext context) =>
-                  StopsInfoBloc(_transitEasyRepository)),
-          BlocProvider<StopsLocationsMapBloc>(
-              create: (BuildContext context) => StopsLocationsMapBloc(
-                  _userLocationRepository,
-                  _userSettingsRepository,
-                  _transitEasyRepository)),
-          BlocProvider<UserLocationBloc>(
-              create: (BuildContext context) => _userLocationBloc),
-          BlocProvider(
-              create: (BuildContext context) =>
-                  UserSettingsBloc(_userSettingsRepository)),
-          BlocProvider(
-              create: (BuildContext context) =>
-                  ServiceAlertsBloc(_transitEasyRepository)),
-          BlocProvider(
-              create: (BuildContext context) =>
-                  BusRoutesListBloc(_transitEasyRepository)),
-        ],
-        child: MaterialApp(
-          title: 'TransitEasy',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-              primarySwatch: Colors.blue,
-              visualDensity: VisualDensity.adaptivePlatformDensity),
-          home: StopsLocationsScreen(),
-        ));
+    return FutureBuilder(
+        future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          return MultiBlocProvider(
+              providers: [
+                BlocProvider<StopNumberSearchBloc>(
+                    create: (BuildContext context) => StopNumberSearchBloc(
+                        _userSettingsRepository, _transitEasyRepository)),
+                BlocProvider<NextBusScheduleBloc>(
+                    create: (BuildContext context) => NextBusScheduleBloc(
+                        _userSettingsRepository, _transitEasyRepository)),
+                BlocProvider<LocationRadiusConfigBloc>(
+                    create: (BuildContext context) =>
+                        LocationRadiusConfigBloc(SettingsService())),
+                BlocProvider<PermissionsBloc>(
+                    create: (BuildContext context) =>
+                        PermissionsBloc(_geoLocationService)),
+                BlocProvider<StopsInfoBloc>(
+                    create: (BuildContext context) =>
+                        StopsInfoBloc(_transitEasyRepository)),
+                BlocProvider<StopsLocationsMapBloc>(
+                    create: (BuildContext context) => StopsLocationsMapBloc(
+                        _userLocationRepository,
+                        _userSettingsRepository,
+                        _transitEasyRepository)),
+                BlocProvider<UserLocationBloc>(
+                    create: (BuildContext context) => _userLocationBloc),
+                BlocProvider(
+                    create: (BuildContext context) =>
+                        UserSettingsBloc(_userSettingsRepository)),
+                BlocProvider(
+                    create: (BuildContext context) =>
+                        ServiceAlertsBloc(_transitEasyRepository)),
+                BlocProvider(
+                    create: (BuildContext context) =>
+                        BusRoutesListBloc(_transitEasyRepository)),
+              ],
+              child: MaterialApp(
+                title: 'TransitEasy',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                    primarySwatch: Colors.blue,
+                    visualDensity: VisualDensity.adaptivePlatformDensity),
+                home: StopsLocationsScreen(),
+              ));
+        });
   }
 
   @override
