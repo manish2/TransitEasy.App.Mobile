@@ -18,6 +18,7 @@ import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/constants.dart';
 import 'package:TransitEasy/screens/stopslocation/stop_details.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,6 +46,14 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
       this.stopsLocationsMapBloc, this.nextBusScheduleBloc);
 
   final Completer<GoogleMapController> _controller = Completer();
+
+  @override
+  void initState() {
+    super.initState();
+    _stopInfoStreamController = StreamController<String>();
+    _fToast.init(context);
+  }
+
   Widget handleMapLoadSuccess(
       StopsLocationMapLoadSucess mapSuccessState, BuildContext context) {
     return Stack(
@@ -176,101 +185,112 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
       return "DELAYED";
   }
 
-  void initState() {
-    super.initState();
-    _stopInfoStreamController = StreamController<String>();
-    _fToast.init(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     stopsLocationsMapBloc.add(StopsLocationMapRequested(
         (ev, stopInfo) => showDialog(
             context: context, builder: (context) => StopDetails(stopInfo)),
         false));
-    return SlidingUpPanel(
-      maxHeight: 700,
-      header: StreamBuilder<String>(
-          stream: _stopInfoStreamController.stream,
-          initialData: "   No stops selected!   ",
-          builder: (context, snapshot) => FocusedMenuHolder(
-                  menuWidth: MediaQuery.of(context).size.width * 0.50,
-                  blurSize: 5.0,
-                  menuBoxDecoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.all(Radius.circular(15.0))),
-                  duration: Duration(milliseconds: 100),
-                  animateMenuItems: true,
-                  blurBackgroundColor: Colors.black54,
-                  openWithTap: false,
-                  menuOffset: 10.0,
-                  child: Container(
-                      child: Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0)),
-                          color: Colors.cyanAccent,
-                          child: Text(
-                              snapshot.hasData
-                                  ? snapshot.data!
-                                  : "   No stops selected!   ",
-                              style: FontBuilder.buildCommonAppThemeFont(
-                                  20, Colors.black87)))),
-                  onPressed: () => {},
-                  menuItems: [
-                    FocusedMenuItem(
-                        title: Text("Pin stop"),
-                        trailingIcon: Icon(
-                          Icons.push_pin,
-                          color: Colors.cyanAccent,
-                        ),
-                        onPressed: () => {
-                              developer.log('Pin Stop was pressed!',
-                                  name: 'my.app.category')
-                            })
-                  ])),
-      panel: BlocBuilder<NextBusScheduleBloc, NextBusScheduleState>(
-        bloc: nextBusScheduleBloc,
-        builder: (context, state) {
-          if (state is NextBusScheduleLoadSuccess) {
-            return Padding(
-                padding: EdgeInsets.only(
-                    left: 10.0, right: 0.0, top: 25.0, bottom: 0.0),
-                child: getNextBusSchedulesList(state.nextBusStopInfo));
-          } else if (state is NextBusScheduleLoadInProgress ||
-              state is NextBusScheduleInitial) {
-            return Padding(
-              padding: EdgeInsets.only(
-                  left: 10.0, right: 0.0, top: 50.0, bottom: 0.0),
-              child: Container(
-                child: getLoadingScreen(),
-              ),
-            );
-          }
-          return Padding(
-            padding:
-                EdgeInsets.only(left: 10.0, right: 0.0, top: 50.0, bottom: 0.0),
-            child: Container(
-              child: Text("FAILED", style: TextStyle(color: Colors.white)),
-            ),
-          );
-        },
-      ),
-      color: Color.fromRGBO(51, 0, 123, .95),
-      backdropEnabled: true,
-      backdropOpacity: 0.6,
-      body: BlocBuilder<StopsLocationsMapBloc, StopsLocationMapState>(
-          bloc: stopsLocationsMapBloc,
-          builder: (context, state) {
-            if (state is StopsLocationMapLoadSucess) {
-              return Stack(
-                children: [handleMapLoadSuccess(state, context)],
-              );
-            } else if (state is StopsLocationMapLoadFailed) {
-              return ErrorPage();
-            }
-            return getLoadingScreen();
-          }),
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    Future<NotificationSettings> notificationsRequest =
+        messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
     );
+    return FutureBuilder(
+        future: notificationsRequest,
+        builder: (context, snapshot) {
+          return SlidingUpPanel(
+            maxHeight: 700,
+            header: StreamBuilder<String>(
+                stream: _stopInfoStreamController.stream,
+                initialData: "   No stops selected!   ",
+                builder: (context, snapshot) => FocusedMenuHolder(
+                        menuWidth: MediaQuery.of(context).size.width * 0.50,
+                        blurSize: 5.0,
+                        menuBoxDecoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0))),
+                        duration: Duration(milliseconds: 100),
+                        animateMenuItems: true,
+                        blurBackgroundColor: Colors.black54,
+                        openWithTap: false,
+                        menuOffset: 10.0,
+                        child: Container(
+                            child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0)),
+                                color: Colors.cyanAccent,
+                                child: Text(
+                                    snapshot.hasData
+                                        ? snapshot.data!
+                                        : "   No stops selected!   ",
+                                    style: FontBuilder.buildCommonAppThemeFont(
+                                        20, Colors.black87)))),
+                        onPressed: () => {},
+                        menuItems: [
+                          FocusedMenuItem(
+                              title: Text("Pin stop"),
+                              trailingIcon: Icon(
+                                Icons.push_pin,
+                                color: Colors.cyanAccent,
+                              ),
+                              onPressed: () => {
+                                    developer.log('Pin Stop was pressed!',
+                                        name: 'my.app.category')
+                                  })
+                        ])),
+            panel: BlocBuilder<NextBusScheduleBloc, NextBusScheduleState>(
+              bloc: nextBusScheduleBloc,
+              builder: (context, state) {
+                if (state is NextBusScheduleLoadSuccess) {
+                  return Padding(
+                      padding: EdgeInsets.only(
+                          left: 10.0, right: 0.0, top: 25.0, bottom: 0.0),
+                      child: getNextBusSchedulesList(state.nextBusStopInfo));
+                } else if (state is NextBusScheduleLoadInProgress ||
+                    state is NextBusScheduleInitial) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                        left: 10.0, right: 0.0, top: 50.0, bottom: 0.0),
+                    child: Container(
+                      child: getLoadingScreen(),
+                    ),
+                  );
+                }
+                return Padding(
+                  padding: EdgeInsets.only(
+                      left: 10.0, right: 0.0, top: 50.0, bottom: 0.0),
+                  child: Container(
+                    child:
+                        Text("FAILED", style: TextStyle(color: Colors.white)),
+                  ),
+                );
+              },
+            ),
+            color: Color.fromRGBO(51, 0, 123, .95),
+            backdropEnabled: true,
+            backdropOpacity: 0.6,
+            body: BlocBuilder<StopsLocationsMapBloc, StopsLocationMapState>(
+                bloc: stopsLocationsMapBloc,
+                builder: (context, state) {
+                  if (state is StopsLocationMapLoadSucess) {
+                    return Stack(
+                      children: [handleMapLoadSuccess(state, context)],
+                    );
+                  } else if (state is StopsLocationMapLoadFailed) {
+                    return ErrorPage();
+                  }
+                  return getLoadingScreen();
+                }),
+          );
+        });
   }
 
   @override
