@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class LocationRadiusConfigBloc extends Bloc<LocationRadiusEvent, int> {
   late int _configuredRadius;
   final SettingsService _settingsService;
-  LocationRadiusConfigBloc(this._settingsService) : super(100);
+  LocationRadiusConfigBloc(this._settingsService) : super(500);
 
   @override
   Stream<int> mapEventToState(LocationRadiusEvent event) async* {

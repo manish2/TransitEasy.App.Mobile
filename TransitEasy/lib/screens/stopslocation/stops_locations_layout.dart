@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:TransitEasy/blocs/events/nextbuschedule/nextbusschedule_requested.dart';
+import 'package:TransitEasy/blocs/events/schedulednotifications/create_scheduled_notification_requested.dart';
 import 'package:TransitEasy/blocs/events/stopslocationmap/stopslocationmap_requested.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
+import 'package:TransitEasy/blocs/schedulednotifications_bloc.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_initial.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_in_progress.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_success.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_state.dart';
+import 'package:TransitEasy/blocs/states/schedulednotifications/scheduled_notification_add_succeeded.dart';
 import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_load_failed.dart';
 import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_load_success.dart';
 import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_state.dart';
@@ -17,6 +20,7 @@ import 'package:TransitEasy/clients/models/stop_info.dart';
 import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/constants.dart';
+import 'package:TransitEasy/screen.dart';
 import 'package:TransitEasy/screens/stopslocation/stop_details.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,19 +35,61 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 class StopsLocationsLayout extends StatefulWidget {
   final StopsLocationsMapBloc stopsLocationsMapBloc;
   final NextBusScheduleBloc nextBusScheduleBloc;
-  StopsLocationsLayout(this.stopsLocationsMapBloc, this.nextBusScheduleBloc);
+  final ScheduledNotificationsBloc scheduledNotificationsBloc;
+
+  StopsLocationsLayout(this.stopsLocationsMapBloc, this.nextBusScheduleBloc,
+      this.scheduledNotificationsBloc);
   @override
-  State<StatefulWidget> createState() =>
-      StopsLocationsLayoutState(stopsLocationsMapBloc, nextBusScheduleBloc);
+  State<StatefulWidget> createState() => StopsLocationsLayoutState(
+      stopsLocationsMapBloc, nextBusScheduleBloc, scheduledNotificationsBloc);
 }
 
 class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
   final StopsLocationsMapBloc stopsLocationsMapBloc;
   final NextBusScheduleBloc nextBusScheduleBloc;
+  final ScheduledNotificationsBloc scheduledNotificationsBloc;
   final FToast _fToast = FToast();
+  final Widget _successToast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: Colors.greenAccent,
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.check),
+        SizedBox(
+          width: 12.0,
+        ),
+        Text("Notification scheduled succesfully!"),
+      ],
+    ),
+  );
+
+  final Widget _failToast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: Colors.redAccent,
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.error),
+        SizedBox(
+          width: 12.0,
+        ),
+        Text("Failed to save schedule notification!"),
+      ],
+    ),
+  );
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+
   late StreamController<String> _stopInfoStreamController;
-  StopsLocationsLayoutState(
-      this.stopsLocationsMapBloc, this.nextBusScheduleBloc);
+
+  StopsLocationsLayoutState(this.stopsLocationsMapBloc,
+      this.nextBusScheduleBloc, this.scheduledNotificationsBloc);
 
   final Completer<GoogleMapController> _controller = Completer();
 
@@ -114,13 +160,6 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
     );
   }
 
-  double _getZoomFactor(double radius) {
-    if (radius < 300)
-      return 0.5;
-    else
-      return 0.2;
-  }
-
   Widget getLoadingScreen() {
     return Container(
         child: SizedBox(
@@ -134,7 +173,8 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
         color: appPageColor);
   }
 
-  Widget getNextBusSchedulesList(List<NextBusStopInfo>? nextBusStopInfo) {
+  Widget getNextBusSchedulesList(
+      List<NextBusStopInfo>? nextBusStopInfo, int stopNumber) {
     if (nextBusStopInfo == null || nextBusStopInfo.isEmpty) {
       return Container(
         width: 10,
@@ -149,6 +189,62 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
         ),
       );
     }
+
+    List<Widget> nextBusLists = nextBusStopInfo
+        .map((e) => Container(
+              decoration: BoxDecoration(
+                  color: Colors.cyanAccent,
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(color: Theme.of(context).primaryColor)),
+              child: ExpansionTile(
+                title: Container(
+                  child: Text(e.routeDescription),
+                ),
+                children: e.schedules
+                    .map((schedule) => FocusedMenuHolder(
+                          child: ListTile(
+                            title: Text(schedule.destination),
+                            subtitle: Text(
+                                "STATUS: ${getStatusString(schedule.scheduleStatus)}"),
+                            trailing: Text("${schedule.countdownInMin} min"),
+                          ),
+                          onPressed: () {},
+                          menuItems: [
+                            FocusedMenuItem(
+                                title: Text("Remind me when this bus is close"),
+                                trailingIcon: Icon(Icons.alarm_add),
+                                onPressed: () {
+                                  scheduledNotificationsBloc
+                                      .handleEvent(
+                                          CreateScheduledNotificationRequested(
+                                    schedule.expectedLeaveTime,
+                                    e.routeDescription,
+                                    schedule.destination,
+                                    stopNumber.toString(),
+                                  ))
+                                      .then((value) {
+                                    if (value
+                                        is ScheduledNotificationAddSucceeded) {
+                                      _fToast.showToast(
+                                          child: _successToast,
+                                          gravity: ToastGravity.BOTTOM,
+                                          toastDuration: Duration(seconds: 2));
+                                    } else {
+                                      _fToast.showToast(
+                                          child: _failToast,
+                                          gravity: ToastGravity.BOTTOM,
+                                          toastDuration: Duration(seconds: 2));
+                                    }
+                                  });
+                                })
+                          ],
+                        ))
+                    .toList(),
+                childrenPadding: EdgeInsets.all(10.0),
+              ),
+            ))
+        .toList();
+
     List<Widget> nextBusList = nextBusStopInfo
         .map((e) => Container(
               decoration: BoxDecoration(
@@ -172,7 +268,7 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
             ))
         .toList();
     return ListView(
-      children: nextBusList,
+      children: nextBusLists,
     );
   }
 
@@ -191,9 +287,8 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
         (ev, stopInfo) => showDialog(
             context: context, builder: (context) => StopDetails(stopInfo)),
         false));
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
     Future<NotificationSettings> notificationsRequest =
-        messaging.requestPermission(
+        _messaging.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -206,7 +301,7 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
         future: notificationsRequest,
         builder: (context, snapshot) {
           return SlidingUpPanel(
-            maxHeight: 700,
+            maxHeight: Screen.height(context) * .7,
             header: StreamBuilder<String>(
                 stream: _stopInfoStreamController.stream,
                 initialData: "   No stops selected!   ",
@@ -253,7 +348,8 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                   return Padding(
                       padding: EdgeInsets.only(
                           left: 10.0, right: 0.0, top: 25.0, bottom: 0.0),
-                      child: getNextBusSchedulesList(state.nextBusStopInfo));
+                      child: getNextBusSchedulesList(
+                          state.nextBusStopInfo, state.stopNo));
                 } else if (state is NextBusScheduleLoadInProgress ||
                     state is NextBusScheduleInitial) {
                   return Padding(

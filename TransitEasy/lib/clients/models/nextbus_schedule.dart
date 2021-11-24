@@ -9,9 +9,14 @@ class NextBusSchedule {
   int countdownInMin;
   NextBusScheduleStatus scheduleStatus;
   String destination;
-
-  NextBusSchedule(this.isTripCancelled, this.isStopCancelled,
-      this.countdownInMin, this.scheduleStatus, this.destination);
+  DateTime expectedLeaveTime;
+  NextBusSchedule(
+      this.isTripCancelled,
+      this.isStopCancelled,
+      this.countdownInMin,
+      this.scheduleStatus,
+      this.destination,
+      this.expectedLeaveTime);
 
   factory NextBusSchedule.fromJson(Map<String, dynamic> data) =>
       _$NextBusScheduleFromJson(data);

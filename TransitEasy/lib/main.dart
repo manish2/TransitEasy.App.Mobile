@@ -9,11 +9,14 @@ import 'package:TransitEasy/blocs/stopslocationmap_bloc.dart';
 import 'package:TransitEasy/blocs/userlocation_bloc.dart';
 import 'package:TransitEasy/blocs/usersettings_bloc.dart';
 import 'package:TransitEasy/clients/clients.dart';
+import 'package:TransitEasy/provider/route_provider.dart';
 import 'package:TransitEasy/repositories/repositories.dart';
 import 'package:TransitEasy/repositories/usersettings_repository.dart';
 import 'package:TransitEasy/screens/stopslocation/stops_locations.dart';
+import 'package:TransitEasy/services/dynamic_link_service.dart';
 import 'package:TransitEasy/services/geolocation_service.dart';
 import 'package:TransitEasy/services/settings_service.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/observers/default_bloc_observer.dart';
@@ -43,7 +46,7 @@ class _MyAppState extends State<MyApp> {
     final UserLocationBloc _userLocationBloc =
         UserLocationBloc(_userLocationRepository);
     return FutureBuilder(
-        future: Firebase.initializeApp(),
+        future: initApp(),
         builder: (context, snapshot) {
           return MultiBlocProvider(
               providers: [
@@ -85,9 +88,36 @@ class _MyAppState extends State<MyApp> {
                 theme: ThemeData(
                     primarySwatch: Colors.blue,
                     visualDensity: VisualDensity.adaptivePlatformDensity),
+                initialRoute: '/',
+                onGenerateRoute: RouteProvider.generateRoute,
                 home: StopsLocationsScreen(),
               ));
         });
+  }
+
+  Future initApp() async {
+    await Firebase.initializeApp();
+    await handleDynamicLinks();
+  }
+
+  Future handleDynamicLinks() async {
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    _handleDeepLink(data);
+
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData? data) async {
+      _handleDeepLink(data);
+    }, onError: (OnLinkErrorException e) async {
+      print("Dynamic link failed $e");
+    });
+  }
+
+  void _handleDeepLink(PendingDynamicLinkData? data) {
+    final Uri? deepLink = data?.link;
+    if (deepLink != null) {
+      Navigator.of(context).pushNamed(deepLink.path);
+    }
   }
 
   @override

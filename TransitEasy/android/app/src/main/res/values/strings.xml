@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nearby_stops_capture">
+        nearby stops
+    </string>
+    <string name="nearby_shortcut_short_label">nearby stops</string>
+    <string name="nearby_shortcut_long_label">stops near me</string>
+    <string name="service_alerts_shortcut_short_label">service alerts</string>
+    <string name="service_alerts_shortcut_long_label">service alertss</string>
+</resources>

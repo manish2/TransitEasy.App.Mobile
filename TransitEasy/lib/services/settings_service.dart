@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsService {
   final int defaultStopsSearchRadiusMeters = 500;
-  final int defaultBusAlertTrigger = 3;
+  final int defaultBusAlertTrigger = 5;
   final int defaultBusLocationRefreshIntervalSeconds = 5;
   final int defaultNextBuses = 2;
 

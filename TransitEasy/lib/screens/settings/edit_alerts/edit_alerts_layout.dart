@@ -112,16 +112,16 @@ class EditAlertsLayoutState extends State<EditAlertsLayout> {
           if (snapshot.hasData && snapshot.data != null) {
             return AlertDialog(
                 title: Text(
-                    "When do you want me to alert you about your bus (how many stops away)?",
+                    "How many minutes before departure do you want me to alert you about your bus?",
                     style: FontBuilder.buildCommonAppThemeFont(
                         18, Colors.black87)),
                 content:
                     Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                   NumberPicker(
-                      minValue: 1,
-                      maxValue: 5,
+                      minValue: 5,
+                      maxValue: 25,
                       value: _currAlertSettingValue,
-                      step: 1,
+                      step: 5,
                       itemWidth: 50,
                       axis: Axis.horizontal,
                       selectedTextStyle: TextStyle(color: Colors.purpleAccent),

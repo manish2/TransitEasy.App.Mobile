@@ -30,7 +30,8 @@ class StopNumberSearchBloc
         var stopNumber = event.stopNumber;
         var nextBusScheduleInfo = await _transitEasyRepository
             .getNextBusSchedules(stopNumber, numBuses);
-        yield NextBusScheduleLoadSuccess(nextBusScheduleInfo.nextBusStopInfo);
+        yield NextBusScheduleLoadSuccess(
+            nextBusScheduleInfo.nextBusStopInfo, stopNumber);
       }
     } catch (_) {
       yield NextBusScheduleLoadFailed();

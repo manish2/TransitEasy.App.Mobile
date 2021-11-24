@@ -12,10 +12,24 @@ ServiceAlertResult _$ServiceAlertResultFromJson(Map<String, dynamic> json) {
       (k, e) =>
           MapEntry(k, ServiceAlertInfo.fromJson(e as Map<String, dynamic>)),
     ),
+    (json['skytrainAlerts'] as Map<String, dynamic>).map(
+      (k, e) =>
+          MapEntry(k, ServiceAlertInfo.fromJson(e as Map<String, dynamic>)),
+    ),
+    ServiceAlertInfo.fromJson(json['seaBusAlerts'] as Map<String, dynamic>),
+    (json['stationAccessAlerts'] as Map<String, dynamic>).map(
+      (k, e) =>
+          MapEntry(k, ServiceAlertInfo.fromJson(e as Map<String, dynamic>)),
+    ),
   );
 }
 
 Map<String, dynamic> _$ServiceAlertResultToJson(ServiceAlertResult instance) =>
     <String, dynamic>{
       'busAlerts': instance.busAlerts.map((k, e) => MapEntry(k, e.toJson())),
+      'skytrainAlerts':
+          instance.skytrainAlerts.map((k, e) => MapEntry(k, e.toJson())),
+      'seaBusAlerts': instance.seaBusAlerts.toJson(),
+      'stationAccessAlerts':
+          instance.stationAccessAlerts.map((k, e) => MapEntry(k, e.toJson())),
     };

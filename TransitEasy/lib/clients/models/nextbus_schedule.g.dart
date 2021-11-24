@@ -13,6 +13,7 @@ NextBusSchedule _$NextBusScheduleFromJson(Map<String, dynamic> json) {
     json['countdownInMin'] as int,
     _$enumDecode(_$NextBusScheduleStatusEnumMap, json['scheduleStatus']),
     json['destination'] as String,
+    DateTime.parse(json['expectedLeaveTime'] as String),
   );
 }
 
@@ -23,6 +24,7 @@ Map<String, dynamic> _$NextBusScheduleToJson(NextBusSchedule instance) =>
       'countdownInMin': instance.countdownInMin,
       'scheduleStatus': _$NextBusScheduleStatusEnumMap[instance.scheduleStatus],
       'destination': instance.destination,
+      'expectedLeaveTime': instance.expectedLeaveTime.toIso8601String(),
     };
 
 K _$enumDecode<K, V>(
