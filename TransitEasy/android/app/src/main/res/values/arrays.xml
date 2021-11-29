@@ -8,4 +8,22 @@
         <item>service alerts</item>
         <item>service alerts</item>
     </string-array>
+    <string-array name="track_my_bus_synonyms">
+        <item>live location</item>
+        <item>bus location</item>
+        <item>track my bus</item>
+    </string-array>
+    <string-array name="open_stop_numbers">
+        <item>stop numbers</item>
+        <item>stop number</item>
+        <item>enter stop number</item>
+    </string-array>
+    <string-array name="open_skytrain_schedules">
+        <item>skytrain shchedules</item>
+        <item>skytrain hours</item>
+    </string-array>
+    <string-array name="open_seabus_schedules">
+        <item>seabus shchedules</item>
+        <item>seabus hours</item>
+    </string-array>
 </resources>

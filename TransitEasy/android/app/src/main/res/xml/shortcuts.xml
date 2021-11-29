@@ -1,0 +1,52 @@
+<shortcuts
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <capability
+        android:name="custom.actions.intent.OPEN_NEARBY_STOPS"
+        queryPatterns="@array/nearby_stops_synonyms">
+        <intent>
+            <url-template
+                android:value="https://transiteasy.com/" />
+        </intent>
+    </capability>
+    <capability
+        android:name="custom.actions.intent.OPEN_SERVICE_ALERTS"
+        queryPatterns="@array/service_alerts_synonyms">
+        <intent>
+            <url-template
+                android:value="https://transiteasy.com/servicealerts" />
+        </intent>
+    </capability>
+    <capability
+        android:name="custom.actions.intent.OPEN_TRACK_MY_BUS"
+        queryPatterns="@array/track_my_bus_synonyms">
+        <intent>
+            <url-template
+                android:value="https://transiteasy.com/trackmybus" />
+        </intent>
+    </capability>
+    <capability
+        android:name="custom.actions.intent.OPEN_STOP_NUMBER"
+        queryPatterns="@array/open_stop_numbers">
+        <intent>
+            <url-template
+                android:value="https://transiteasy.com/stopnumber" />
+        </intent>
+    </capability>
+    <capability
+        android:name="custom.actions.intent.OPEN_SKYTRAIN_SCHEDULES"
+        queryPatterns="@array/open_skytrain_schedules">
+        <intent>
+            <url-template
+                android:value="https://transiteasy.com/skytrainschedule" />
+        </intent>
+    </capability>
+    <capability
+        android:name="custom.actions.intent.OPEN_SEABUS_SCHEDULES"
+        queryPatterns="@array/open_seabus_schedules">
+        <intent>
+            <url-template
+                android:value="https://transiteasy.com/seabusschedule" />
+        </intent>
+    </capability>
+</shortcuts>

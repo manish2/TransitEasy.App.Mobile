@@ -318,7 +318,9 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                         openWithTap: false,
                         menuOffset: 10.0,
                         child: Container(
-                            child: Card(
+                            child: Row(
+                          children: [
+                            Card(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0)),
                                 color: Colors.cyanAccent,
@@ -327,7 +329,32 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                                         ? snapshot.data!
                                         : "   No stops selected!   ",
                                     style: FontBuilder.buildCommonAppThemeFont(
-                                        20, Colors.black87)))),
+                                        20, Colors.black87))),
+                            Container(
+                              width: 50,
+                              color: Colors.transparent,
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  print("CLICKED PUSH PIN");
+                                },
+                                icon: Icon(
+                                  Icons.push_pin,
+                                  color: Colors.cyanAccent,
+                                ))
+                          ],
+                        )
+                            /*Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0)),
+                                color: Colors.cyanAccent,
+                                child: Text(
+                                    snapshot.hasData
+                                        ? snapshot.data!
+                                        : "   No stops selected!   ",
+                                    style: FontBuilder.buildCommonAppThemeFont(
+                                        20, Colors.black87)))*/
+                            ),
                         onPressed: () => {},
                         menuItems: [
                           FocusedMenuItem(

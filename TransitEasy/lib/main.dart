@@ -97,10 +97,10 @@ class _MyAppState extends State<MyApp> {
 
   Future initApp() async {
     await Firebase.initializeApp();
-    await handleDynamicLinks();
+    //await handleDynamicLinks();
   }
 
-  Future handleDynamicLinks() async {
+  /*Future handleDynamicLinks() async {
     final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();
     _handleDeepLink(data);
@@ -115,10 +115,12 @@ class _MyAppState extends State<MyApp> {
 
   void _handleDeepLink(PendingDynamicLinkData? data) {
     final Uri? deepLink = data?.link;
+    print(deepLink?.queryParameters.toString());
+    var x = deepLink?.queryParameters;
     if (deepLink != null) {
       Navigator.of(context).pushNamed(deepLink.path);
     }
-  }
+  }*/
 
   @override
   void dispose() {

@@ -7,4 +7,5 @@
     <string name="nearby_shortcut_long_label">stops near me</string>
     <string name="service_alerts_shortcut_short_label">service alerts</string>
     <string name="service_alerts_shortcut_long_label">service alertss</string>
+    <string name="text_filter_param_name">filter</string>
 </resources>
