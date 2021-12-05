@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:TransitEasy/blocs/events/nextbuschedule/nextbusschedule_requested.dart';
+import 'package:TransitEasy/blocs/events/pinnedstops/pin_stop_request.dart';
 import 'package:TransitEasy/blocs/events/schedulednotifications/create_scheduled_notification_requested.dart';
 import 'package:TransitEasy/blocs/events/stopslocationmap/stopslocationmap_requested.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
+import 'package:TransitEasy/blocs/pinnedstops_bloc.dart';
 import 'package:TransitEasy/blocs/schedulednotifications_bloc.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_initial.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_in_progress.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_success.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_state.dart';
+import 'package:TransitEasy/blocs/states/pinnedstops/pin_stop_sucessful.dart';
 import 'package:TransitEasy/blocs/states/schedulednotifications/scheduled_notification_add_succeeded.dart';
 import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_load_failed.dart';
 import 'package:TransitEasy/blocs/states/stopslocationmap/stopslocationmap_load_success.dart';
@@ -22,6 +25,7 @@ import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/constants.dart';
 import 'package:TransitEasy/screen.dart';
 import 'package:TransitEasy/screens/stopslocation/stop_details.dart';
+import 'package:TransitEasy/screens/stopslocation/stop_info_stream_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,18 +40,23 @@ class StopsLocationsLayout extends StatefulWidget {
   final StopsLocationsMapBloc stopsLocationsMapBloc;
   final NextBusScheduleBloc nextBusScheduleBloc;
   final ScheduledNotificationsBloc scheduledNotificationsBloc;
+  final PinnedStopsBloc _pinnedStopsBloc;
 
   StopsLocationsLayout(this.stopsLocationsMapBloc, this.nextBusScheduleBloc,
-      this.scheduledNotificationsBloc);
+      this.scheduledNotificationsBloc, this._pinnedStopsBloc);
   @override
   State<StatefulWidget> createState() => StopsLocationsLayoutState(
-      stopsLocationsMapBloc, nextBusScheduleBloc, scheduledNotificationsBloc);
+      stopsLocationsMapBloc,
+      nextBusScheduleBloc,
+      scheduledNotificationsBloc,
+      _pinnedStopsBloc);
 }
 
 class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
   final StopsLocationsMapBloc stopsLocationsMapBloc;
   final NextBusScheduleBloc nextBusScheduleBloc;
   final ScheduledNotificationsBloc scheduledNotificationsBloc;
+  final PinnedStopsBloc _pinnedStopsBloc;
   final FToast _fToast = FToast();
   final Widget _successToast = Container(
     padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
@@ -63,6 +72,23 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
           width: 12.0,
         ),
         Text("Notification scheduled succesfully!"),
+      ],
+    ),
+  );
+  final Widget _pinSuccessToast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: Colors.greenAccent,
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.check),
+        SizedBox(
+          width: 12.0,
+        ),
+        Text("Stop pinned succesfully!"),
       ],
     ),
   );
@@ -86,18 +112,32 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
   );
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
-  late StreamController<String> _stopInfoStreamController;
+  late StreamController<StopInfoStreamModel> _stopInfoStreamController;
+  late StreamSubscription _pinnedStopsStreamSubscription;
 
-  StopsLocationsLayoutState(this.stopsLocationsMapBloc,
-      this.nextBusScheduleBloc, this.scheduledNotificationsBloc);
+  StopsLocationsLayoutState(
+      this.stopsLocationsMapBloc,
+      this.nextBusScheduleBloc,
+      this.scheduledNotificationsBloc,
+      this._pinnedStopsBloc);
 
   final Completer<GoogleMapController> _controller = Completer();
 
   @override
   void initState() {
-    super.initState();
-    _stopInfoStreamController = StreamController<String>();
+    _stopInfoStreamController = StreamController<StopInfoStreamModel>();
     _fToast.init(context);
+    _pinnedStopsStreamSubscription = _pinnedStopsBloc.stream.listen((state) {
+      if (state is PinStopSucessful) {
+        _fToast.showToast(
+            child: _pinSuccessToast,
+            gravity: ToastGravity.BOTTOM,
+            toastDuration: Duration(seconds: 2));
+      }
+    }, onError: (error) {
+      developer.log("SOMETHING WENT WRONG!!");
+    });
+    super.initState();
   }
 
   Widget handleMapLoadSuccess(
@@ -121,10 +161,13 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
     var stopLocationMarkers = mapSuccessState.busLocations.map((stopInfo) =>
         new Marker(
             onTap: () => {
-                  _stopInfoStreamController
-                      .add("   ${stopInfo.stopNo}: ${stopInfo.stopName}   "),
-                  nextBusScheduleBloc
-                      .add(NextBusScheduleRequested(stopInfo.stopNo))
+                  _stopInfoStreamController.add(new StopInfoStreamModel(
+                      stopInfo.stopNo,
+                      stopInfo.stopName,
+                      stopInfo.latitude,
+                      stopInfo.longitude)),
+                  nextBusScheduleBloc.add(NextBusScheduleRequested(
+                      stopInfo.stopNo, stopInfo.latitude, stopInfo.longitude))
                 },
             markerId: MarkerId(stopInfo.stopNo.toString()),
             position: LatLng(stopInfo.latitude, stopInfo.longitude),
@@ -245,28 +288,6 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
             ))
         .toList();
 
-    List<Widget> nextBusList = nextBusStopInfo
-        .map((e) => Container(
-              decoration: BoxDecoration(
-                  color: Colors.cyanAccent,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                  border: Border.all(color: Theme.of(context).primaryColor)),
-              child: ExpansionTile(
-                title: Container(
-                  child: Text(e.routeDescription),
-                ),
-                children: e.schedules
-                    .map((schedule) => ListTile(
-                          title: Text(schedule.destination),
-                          subtitle: Text(
-                              "STATUS: ${getStatusString(schedule.scheduleStatus)}"),
-                          trailing: Text("${schedule.countdownInMin} min"),
-                        ))
-                    .toList(),
-                childrenPadding: EdgeInsets.all(10.0),
-              ),
-            ))
-        .toList();
     return ListView(
       children: nextBusLists,
     );
@@ -302,9 +323,8 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
         builder: (context, snapshot) {
           return SlidingUpPanel(
             maxHeight: Screen.height(context) * .7,
-            header: StreamBuilder<String>(
+            header: StreamBuilder<StopInfoStreamModel>(
                 stream: _stopInfoStreamController.stream,
-                initialData: "   No stops selected!   ",
                 builder: (context, snapshot) => FocusedMenuHolder(
                         menuWidth: MediaQuery.of(context).size.width * 0.50,
                         blurSize: 5.0,
@@ -318,43 +338,16 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                         openWithTap: false,
                         menuOffset: 10.0,
                         child: Container(
-                            child: Row(
-                          children: [
-                            Card(
+                            child: Card(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0)),
                                 color: Colors.cyanAccent,
                                 child: Text(
                                     snapshot.hasData
-                                        ? snapshot.data!
+                                        ? "   ${snapshot.data!.stopNo}: ${snapshot.data!.stopName}   "
                                         : "   No stops selected!   ",
                                     style: FontBuilder.buildCommonAppThemeFont(
-                                        20, Colors.black87))),
-                            Container(
-                              width: 50,
-                              color: Colors.transparent,
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  print("CLICKED PUSH PIN");
-                                },
-                                icon: Icon(
-                                  Icons.push_pin,
-                                  color: Colors.cyanAccent,
-                                ))
-                          ],
-                        )
-                            /*Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0)),
-                                color: Colors.cyanAccent,
-                                child: Text(
-                                    snapshot.hasData
-                                        ? snapshot.data!
-                                        : "   No stops selected!   ",
-                                    style: FontBuilder.buildCommonAppThemeFont(
-                                        20, Colors.black87)))*/
-                            ),
+                                        20, Colors.black87)))),
                         onPressed: () => {},
                         menuItems: [
                           FocusedMenuItem(
@@ -364,8 +357,8 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                                 color: Colors.cyanAccent,
                               ),
                               onPressed: () => {
-                                    developer.log('Pin Stop was pressed!',
-                                        name: 'my.app.category')
+                                    _pinnedStopsBloc.add(
+                                        new PinStopRequested(snapshot.data!))
                                   })
                         ])),
             panel: BlocBuilder<NextBusScheduleBloc, NextBusScheduleState>(
@@ -419,6 +412,7 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
   @override
   void dispose() {
     super.dispose();
+    _pinnedStopsStreamSubscription.cancel();
     _stopInfoStreamController.close();
   }
 }

@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class PinnedStopsState extends Equatable {
-  const PinnedStopsState();
-
+class PinStopEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }

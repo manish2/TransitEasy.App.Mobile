@@ -2,8 +2,9 @@ import 'package:TransitEasy/blocs/events/nextbuschedule/nextbusschedule_event.da
 
 class NextBusScheduleRequested extends NextBusScheduleEvent {
   final int stopNumber;
-
-  const NextBusScheduleRequested(this.stopNumber);
+  final double? stopLat;
+  final double? stopLong;
+  const NextBusScheduleRequested(this.stopNumber, this.stopLat, this.stopLong);
 
   @override
   List<Object?> get props => [];

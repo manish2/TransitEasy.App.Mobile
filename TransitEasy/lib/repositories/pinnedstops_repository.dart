@@ -7,7 +7,7 @@ class PinnedStopsRepository {
   PinnedStopsRepository(this._settingsService);
 
   Future<List<PinnedStop>> getPinnedStops() async {
-    var data = await _settingsService.getPinnedStopsCsv();
+    var data = await _settingsService.getPinnedStops();
     return data
         .map((e) => PinnedStop.fromJson(e as Map<String, dynamic>))
         .toList();

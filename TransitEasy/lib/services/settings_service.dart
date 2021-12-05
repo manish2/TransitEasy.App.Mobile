@@ -1,4 +1,5 @@
 import 'package:TransitEasy/models/usersettings.dart';
+import 'package:TransitEasy/screens/stopslocation/stop_info_stream_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsService {
@@ -54,14 +55,21 @@ class SettingsService {
     return prefs.setInt(_nextBusesSearchSettingKey, nextBuses);
   }
 
+  Future<bool> pinStop(StopInfoStreamModel model) async {
+    final prefs = await SharedPreferences.getInstance();
+    var pinnedStopsList = await getPinnedStops();
+    pinnedStopsList.add(model.toJsonString());
+    return prefs.setStringList(_pinnedStopsSettingKey, pinnedStopsList);
+  }
+
   Future<bool> addPinnedStop(String stopNo) async {
     final prefs = await SharedPreferences.getInstance();
-    var pinnedStopsList = await getPinnedStopsCsv();
+    var pinnedStopsList = await getPinnedStops();
     pinnedStopsList.add(stopNo);
     return prefs.setStringList(_pinnedStopsSettingKey, pinnedStopsList);
   }
 
-  Future<List<String>> getPinnedStopsCsv() async {
+  Future<List<String>> getPinnedStops() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getStringList(_pinnedStopsSettingKey) ?? [];
   }

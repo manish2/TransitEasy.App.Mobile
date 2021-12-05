@@ -2,7 +2,6 @@ import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:flutter/material.dart';
 
 class NavbarItem extends StatelessWidget {
-  //final IconData icon;
   final String title;
   final IconData icon;
   final bool showDivider;

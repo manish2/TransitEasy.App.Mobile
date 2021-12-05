@@ -1,6 +1,7 @@
 import 'package:TransitEasy/blocs/events/permission/permissions_requested.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/permissions_bloc.dart';
+import 'package:TransitEasy/blocs/pinnedstops_bloc.dart';
 import 'package:TransitEasy/blocs/schedulednotifications_bloc.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_load_success.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_state.dart';
@@ -26,21 +27,26 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final NavBar _navBar = new NavBar();
   final List<PermissionType> _requiredPermissions = [PermissionType.Location];
-  Widget loadWhenPermissionsReturned(PermissionsLoadSuccess permissions,
-      StopsLocationsMapBloc mapBloc, NextBusScheduleBloc nextBusScheduleBloc) {
+  Widget loadWhenPermissionsReturned(
+      PermissionsLoadSuccess permissions,
+      StopsLocationsMapBloc mapBloc,
+      NextBusScheduleBloc nextBusScheduleBloc,
+      PinnedStopsBloc _pinnedStopsBloc) {
     if (!permissions.permissionValues.containsKey(PermissionType.Location) ||
         permissions.permissionValues[PermissionType.Location] != true) {
       return StopsLocationsLayout(
           mapBloc,
           nextBusScheduleBloc,
           ScheduledNotificationsBloc(TransitEasySchedulerApiClient(),
-              UserSettingsRepository(SettingsService())));
+              UserSettingsRepository(SettingsService())),
+          _pinnedStopsBloc);
     }
     return StopsLocationsLayout(
         mapBloc,
         nextBusScheduleBloc,
         ScheduledNotificationsBloc(TransitEasySchedulerApiClient(),
-            UserSettingsRepository(SettingsService())));
+            UserSettingsRepository(SettingsService())),
+        _pinnedStopsBloc);
   }
 
   Widget getLoadingScreen() {
@@ -65,6 +71,8 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
         BlocProvider.of<NextBusScheduleBloc>(context);
     final PermissionsBloc permissionBloc =
         BlocProvider.of<PermissionsBloc>(context);
+    final PinnedStopsBloc pinnedStopsBloc =
+        BlocProvider.of<PinnedStopsBloc>(context);
     permissionBloc.add(PermissionsRequested(_requiredPermissions));
 
     return BlocBuilder<PermissionsBloc, PermissionsState>(
@@ -77,7 +85,7 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
               body: Stack(
                 children: [
                   loadWhenPermissionsReturned(
-                      state, mapBloc, nextBusScheduleBloc),
+                      state, mapBloc, nextBusScheduleBloc, pinnedStopsBloc),
                   FloatingMenu(
                       onTap: () => _scaffoldKey.currentState!.openDrawer())
                 ],

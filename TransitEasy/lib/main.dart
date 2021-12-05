@@ -3,6 +3,7 @@ import 'package:TransitEasy/blocs/busrouteslist_bloc.dart';
 import 'package:TransitEasy/blocs/locationradiusconfig_bloc.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/permissions_bloc.dart';
+import 'package:TransitEasy/blocs/pinnedstops_bloc.dart';
 import 'package:TransitEasy/blocs/servicealerts_bloc.dart';
 import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/blocs/stopslocationmap_bloc.dart';
@@ -50,6 +51,9 @@ class _MyAppState extends State<MyApp> {
         builder: (context, snapshot) {
           return MultiBlocProvider(
               providers: [
+                BlocProvider<PinnedStopsBloc>(
+                    create: (BuildContext context) =>
+                        PinnedStopsBloc(SettingsService())),
                 BlocProvider<StopNumberSearchBloc>(
                     create: (BuildContext context) => StopNumberSearchBloc(
                         _userSettingsRepository, _transitEasyRepository)),

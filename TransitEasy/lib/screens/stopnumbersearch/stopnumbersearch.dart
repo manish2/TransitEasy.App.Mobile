@@ -134,7 +134,7 @@ class StopNumberSearchScreen extends StatelessWidget {
                             ], // Only numbers can be entered
                             onSubmitted: (stopNumber) => {
                               _nextBusScheduleBloc.add(NextBusScheduleRequested(
-                                  int.parse(stopNumber))),
+                                  int.parse(stopNumber), null, null)),
                               FocusScope.of(context).unfocus()
                             },
                           ),
@@ -143,8 +143,8 @@ class StopNumberSearchScreen extends StatelessWidget {
                             onPressed: () {
                               var stopNumber =
                                   int.parse(textFieldController.text);
-                              _nextBusScheduleBloc
-                                  .add(NextBusScheduleRequested(stopNumber));
+                              _nextBusScheduleBloc.add(NextBusScheduleRequested(
+                                  stopNumber, null, null));
                               FocusScope.of(context).unfocus();
                             },
                             child: const Text('Enter'),
