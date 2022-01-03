@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:TransitEasy/blocs/vehicle_locations_bloc.dart';
 import 'package:TransitEasy/clients/models/api_response_status.dart';
 import 'package:TransitEasy/clients/models/vehicles_location_result.dart';
 import 'package:TransitEasy/common/widgets/error/error_page.dart';
@@ -35,10 +34,11 @@ class _VehicleLocationLayout extends State<VehicleLocationLayout> {
   int _focusedBusIndex = 0;
   bool _isDataLoading = true;
   late VehiclesLocationResult _liveResult;
-  static const CAMERA_ZOOM = 17.0;
+  static const CAMERA_ZOOM = 16.0;
   static const CAMERA_TILT = 15.0;
   late StreamSubscription _subscriptionListener;
   bool _isLocationUpdate = false;
+  bool _dataLoadFailed = false;
   Set<Polyline> _polylines = new Set<Polyline>();
   _VehicleLocationLayout(this.stopNo, this.routeNo);
 
@@ -58,51 +58,63 @@ class _VehicleLocationLayout extends State<VehicleLocationLayout> {
   @override
   void initState() {
     super.initState();
-    if (!_isSubscribed) {
-      _webSocketChannel = WebSocketChannel.connect(Uri.parse(
-          "wss://transiteasy3.azurewebsites.net/api/VehiclesLocation/getvehicleslocation?refreshIntervalInSeconds=3&routeNo=$routeNo"));
-      _subscriptionListener = _webSocketChannel.stream.listen((event) async {
-        developer.log("EVENT CAPTURED: $event");
-        var data = json.decode(event.toString()) as Map<String, dynamic>;
-        var result = VehiclesLocationResult.fromJson(data);
-        Set<Polyline> polyLines = new Set<Polyline>();
-        var polyLineIdCount = 0;
-        for (var coordinateData in result
-            .vehicleLocations[_focusedBusIndex].routeMapData.coordinateData) {
-          var coordinates = coordinateData
-              .map((e) => LatLng(e.latitude, e.longitude))
-              .toList();
-          polyLines.add(Polyline(
-              polylineId: PolylineId(polyLineIdCount.toString()),
-              visible: true,
-              color: Colors.green,
-              points: coordinates));
-          polyLineIdCount++;
-        }
+    try {
+      if (!_isSubscribed) {
+        _webSocketChannel = WebSocketChannel.connect(Uri.parse(
+            "wss://transiteasy3.azurewebsites.net/api/VehiclesLocation/getvehicleslocation?refreshIntervalInSeconds=3&routeNo=$routeNo"));
+        _subscriptionListener = _webSocketChannel.stream.listen((event) async {
+          developer.log("EVENT CAPTURED: $event");
+          var data = json.decode(event.toString()) as Map<String, dynamic>;
+          var result = VehiclesLocationResult.fromJson(data);
+          Set<Polyline> polyLines = new Set<Polyline>();
+          var polyLineIdCount = 0;
+          if (result.responseStatus == ApiResponseStatus.NoVehiclesAvailable) {
+            setState(() {
+              _dataLoadFailed = true;
+            });
+          } else {
+            for (var coordinateData in result.vehicleLocations[_focusedBusIndex]
+                .routeMapData.coordinateData) {
+              var coordinates = coordinateData
+                  .map((e) => LatLng(e.latitude, e.longitude))
+                  .toList();
+              polyLines.add(Polyline(
+                  polylineId: PolylineId(polyLineIdCount.toString()),
+                  visible: true,
+                  color: Colors.green,
+                  points: coordinates));
+              polyLineIdCount++;
+            }
+            setState(() {
+              _dataLoadFailed = false;
+              if (_isDataLoading) _isDataLoading = false;
 
-        setState(() {
-          if (_isDataLoading) _isDataLoading = false;
+              _liveResult = result;
 
-          _liveResult = result;
+              _markers = result.vehicleLocations
+                  .map((location) => Marker(
+                      markerId: MarkerId(location.vehicleNo),
+                      position: LatLng(location.latitude, location.longitude)))
+                  .toSet();
 
-          _markers = result.vehicleLocations
-              .map((location) => Marker(
-                  markerId: MarkerId(location.vehicleNo),
-                  position: LatLng(location.latitude, location.longitude)))
-              .toSet();
-
-          _polylines = polyLines;
+              _polylines = polyLines;
+            });
+          }
+          if (_isLocationUpdate) {
+            //when location is updated we need to move the camera with the updated marker for focused bus
+            await _moveCameraToBusLocation();
+          }
+          if (!_isLocationUpdate) {
+            //all subsequent events will be updates
+            _isLocationUpdate = true;
+          }
         });
-        if (_isLocationUpdate) {
-          //when location is updated we need to move the camera with the updated marker for focused bus
-          await _moveCameraToBusLocation();
-        }
-        if (!_isLocationUpdate) {
-          //all subsequent events will be updates
-          _isLocationUpdate = true;
-        }
+        _isSubscribed = true;
+      }
+    } catch (e) {
+      setState(() {
+        _dataLoadFailed = true;
       });
-      _isSubscribed = true;
     }
   }
 
@@ -138,27 +150,37 @@ class _VehicleLocationLayout extends State<VehicleLocationLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return _isDataLoading
-        ? getLoadingScreen()
-        : Stack(children: [
-            _loadVehicleLocationMap(),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: FloatingActionButton(
-                heroTag: "beforeBtn",
-                onPressed: moveCameraToPrevBusLocation,
-                child: Icon(Icons.navigate_before),
+    if (_dataLoadFailed) {
+      return ErrorPage("An error occurred please try again");
+    } else
+      return _isDataLoading
+          ? getLoadingScreen()
+          : Stack(children: [
+              _loadVehicleLocationMap(),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: FloatingActionButton(
+                  heroTag: "beforeBtn",
+                  onPressed: moveCameraToPrevBusLocation,
+                  child: Icon(Icons.navigate_before),
+                ),
               ),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                heroTag: "afterBtn",
-                onPressed: moveCameraToNextBusLocation,
-                child: Icon(Icons.navigate_next),
+              Container(
+                color: Colors.cyanAccent,
+                child: Text(_liveResult
+                        .vehicleLocations[_focusedBusIndex].pattern +
+                    " " +
+                    _liveResult.vehicleLocations[_focusedBusIndex].direction),
               ),
-            )
-          ]);
+              Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  heroTag: "afterBtn",
+                  onPressed: moveCameraToNextBusLocation,
+                  child: Icon(Icons.navigate_next),
+                ),
+              )
+            ]);
   }
 
   Widget _loadVehicleLocationMap() {

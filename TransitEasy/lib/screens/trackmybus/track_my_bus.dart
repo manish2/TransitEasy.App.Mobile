@@ -42,9 +42,10 @@ class TrackMyBusScreen extends StatelessWidget {
         child: ListView(
           children: state.routesInfo
               .map((e) => ListTile(
-                    leading: FittedBox(
+                    leading: SizedBox(
+                      width: MediaQuery.of(context).size.width * .85,
+                      height: MediaQuery.of(context).size.height * .85,
                       child: Text(e.routeShortName + "-" + e.routeLongName),
-                      fit: BoxFit.cover,
                     ),
                     tileColor: Colors.cyanAccent,
                     onTap: () {

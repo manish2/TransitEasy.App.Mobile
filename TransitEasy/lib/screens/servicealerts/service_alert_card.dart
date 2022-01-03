@@ -14,11 +14,11 @@ class ServiceAlertCard extends StatelessWidget {
         children: [
           Text(
             this._alertHeader,
-            style: FontBuilder.buildCommonAppThemeFont(15, Colors.black),
+            style: FontBuilder.buildCommonAppThemeFont(18, Colors.black),
           ),
           Text(
             this._alertDescription,
-            style: FontBuilder.buildCommonAppThemeFont(15, Colors.black),
+            style: FontBuilder.buildCommonAppThemeFont(18, Colors.black),
             textAlign: TextAlign.start,
           )
         ],

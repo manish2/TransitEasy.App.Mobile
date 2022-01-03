@@ -35,11 +35,11 @@ class ServiceAlertsScreen extends StatelessWidget {
         color: appPageColor);
   }
 
-  List<Widget> buildAlertsWidget(ServiceAlertResult apiResult) {
+  List<Widget> buildBusAlertsList(ServiceAlertResult apiResult) {
     List<Widget> busAlerts = [];
     apiResult.busAlerts.forEach((routeName, alertInfo) {
       busAlerts.add(ExpansionTile(
-        trailing: ServiceAlertsCount(),
+        trailing: ServiceAlertsCount(alertInfo.count),
         title: Text(routeName),
         children: alertInfo.alerts
             .map((ai) => ServiceAlertCard(ai.alertHeader, ai.alertDescription))
@@ -47,6 +47,40 @@ class ServiceAlertsScreen extends StatelessWidget {
       ));
     });
     return busAlerts;
+  }
+
+  List<Widget> buildSkytrainAlertsList(ServiceAlertResult apiResult) {
+    List<Widget> skyTrainAlerts = [];
+    apiResult.skytrainAlerts.forEach((lineName, alertInfo) {
+      skyTrainAlerts.add(ExpansionTile(
+        trailing: ServiceAlertsCount(alertInfo.count),
+        title: Text(lineName),
+        children: alertInfo.alerts
+            .map((ai) => ServiceAlertCard(ai.alertHeader, ai.alertDescription))
+            .toList(),
+      ));
+    });
+    return skyTrainAlerts;
+  }
+
+  List<Widget> buildSeabusAlerts(ServiceAlertResult apiResult) {
+    return apiResult.seaBusAlerts.alerts
+        .map((ai) => ServiceAlertCard(ai.alertHeader, ai.alertDescription))
+        .toList();
+  }
+
+  List<Widget> buildStationAccessAlerts(ServiceAlertResult apiResult) {
+    List<Widget> stationAccessAlerts = [];
+    apiResult.stationAccessAlerts.forEach((stationName, alertInfo) {
+      stationAccessAlerts.add(ExpansionTile(
+        trailing: ServiceAlertsCount(alertInfo.count),
+        title: Text(stationName),
+        children: alertInfo.alerts
+            .map((ai) => ServiceAlertCard(ai.alertHeader, ai.alertDescription))
+            .toList(),
+      ));
+    });
+    return stationAccessAlerts;
   }
 
   Widget buildServiceAlerts(ServiceAlertResult apiResult) {
@@ -57,21 +91,32 @@ class ServiceAlertsScreen extends StatelessWidget {
             collapsedBackgroundColor: Colors.cyanAccent,
             backgroundColor: Colors.cyanAccent,
             title: Text("Bus"),
-            children: buildAlertsWidget(apiResult)),
+            children: buildBusAlertsList(apiResult)),
         SizedBox(
           height: 20,
         ),
         ExpansionTile(
-            collapsedBackgroundColor: Colors.cyanAccent,
-            backgroundColor: Colors.cyanAccent,
-            title: Text("Skytrain")),
+          collapsedBackgroundColor: Colors.cyanAccent,
+          backgroundColor: Colors.cyanAccent,
+          title: Text("Skytrain"),
+          children: buildSkytrainAlertsList(apiResult),
+        ),
         SizedBox(
           height: 20,
         ),
         ExpansionTile(
-            collapsedBackgroundColor: Colors.cyanAccent,
-            backgroundColor: Colors.cyanAccent,
-            title: Text("Seabus"))
+          collapsedBackgroundColor: Colors.cyanAccent,
+          backgroundColor: Colors.cyanAccent,
+          title: Text("Seabus"),
+          children: buildSeabusAlerts(apiResult),
+        ),
+        SizedBox(height: 20),
+        ExpansionTile(
+          collapsedBackgroundColor: Colors.cyanAccent,
+          backgroundColor: Colors.cyanAccent,
+          title: Text("Station Access"),
+          children: buildStationAccessAlerts(apiResult),
+        ),
       ],
     );
   }
