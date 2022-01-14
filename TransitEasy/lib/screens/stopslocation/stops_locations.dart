@@ -2,6 +2,7 @@ import 'package:TransitEasy/blocs/events/permission/permissions_requested.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/permissions_bloc.dart';
 import 'package:TransitEasy/blocs/pinnedstops_bloc.dart';
+import 'package:TransitEasy/blocs/pinnedstopsv2_bloc.dart';
 import 'package:TransitEasy/blocs/schedulednotifications_bloc.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_load_success.dart';
 import 'package:TransitEasy/blocs/states/permission/permissions_state.dart';
@@ -32,21 +33,24 @@ class _StopsLocationsState extends State<StopsLocationsScreen> {
       StopsLocationsMapBloc mapBloc,
       NextBusScheduleBloc nextBusScheduleBloc,
       PinnedStopsBloc _pinnedStopsBloc) {
+    var settingsService = SettingsService();
     if (!permissions.permissionValues.containsKey(PermissionType.Location) ||
         permissions.permissionValues[PermissionType.Location] != true) {
       return StopsLocationsLayout(
           mapBloc,
           nextBusScheduleBloc,
           ScheduledNotificationsBloc(TransitEasySchedulerApiClient(),
-              UserSettingsRepository(SettingsService())),
-          _pinnedStopsBloc);
+              UserSettingsRepository(settingsService)),
+          _pinnedStopsBloc,
+          PinnedStopsV2Bloc(settingsService));
     }
     return StopsLocationsLayout(
         mapBloc,
         nextBusScheduleBloc,
         ScheduledNotificationsBloc(TransitEasySchedulerApiClient(),
-            UserSettingsRepository(SettingsService())),
-        _pinnedStopsBloc);
+            UserSettingsRepository(settingsService)),
+        _pinnedStopsBloc,
+        PinnedStopsV2Bloc(settingsService));
   }
 
   Widget getLoadingScreen() {

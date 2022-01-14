@@ -58,8 +58,14 @@ class SettingsService {
   Future<bool> pinStop(StopInfoStreamModel model) async {
     final prefs = await SharedPreferences.getInstance();
     var pinnedStopsList = await getPinnedStops();
-    pinnedStopsList.add(model.toJsonString());
-    return prefs.setStringList(_pinnedStopsSettingKey, pinnedStopsList);
+    if (pinnedStopsList
+        .where((element) => element.contains(model.stopNo.toString()))
+        .isEmpty) {
+      pinnedStopsList.add(model.toJsonString());
+
+      return prefs.setStringList(_pinnedStopsSettingKey, pinnedStopsList);
+    }
+    return Future.delayed(Duration.zero, () => true);
   }
 
   Future<bool> addPinnedStop(String stopNo) async {

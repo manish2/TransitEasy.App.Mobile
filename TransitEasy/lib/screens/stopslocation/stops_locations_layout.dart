@@ -6,6 +6,7 @@ import 'package:TransitEasy/blocs/events/schedulednotifications/create_scheduled
 import 'package:TransitEasy/blocs/events/stopslocationmap/stopslocationmap_requested.dart';
 import 'package:TransitEasy/blocs/nextbusschedule_bloc.dart';
 import 'package:TransitEasy/blocs/pinnedstops_bloc.dart';
+import 'package:TransitEasy/blocs/pinnedstopsv2_bloc.dart';
 import 'package:TransitEasy/blocs/schedulednotifications_bloc.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_initial.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_in_progress.dart';
@@ -41,15 +42,21 @@ class StopsLocationsLayout extends StatefulWidget {
   final NextBusScheduleBloc nextBusScheduleBloc;
   final ScheduledNotificationsBloc scheduledNotificationsBloc;
   final PinnedStopsBloc _pinnedStopsBloc;
+  final PinnedStopsV2Bloc _pinnedStopsV2Bloc;
 
-  StopsLocationsLayout(this.stopsLocationsMapBloc, this.nextBusScheduleBloc,
-      this.scheduledNotificationsBloc, this._pinnedStopsBloc);
+  StopsLocationsLayout(
+      this.stopsLocationsMapBloc,
+      this.nextBusScheduleBloc,
+      this.scheduledNotificationsBloc,
+      this._pinnedStopsBloc,
+      this._pinnedStopsV2Bloc);
   @override
   State<StatefulWidget> createState() => StopsLocationsLayoutState(
       stopsLocationsMapBloc,
       nextBusScheduleBloc,
       scheduledNotificationsBloc,
-      _pinnedStopsBloc);
+      _pinnedStopsBloc,
+      _pinnedStopsV2Bloc);
 }
 
 class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
@@ -57,6 +64,7 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
   final NextBusScheduleBloc nextBusScheduleBloc;
   final ScheduledNotificationsBloc scheduledNotificationsBloc;
   final PinnedStopsBloc _pinnedStopsBloc;
+  final PinnedStopsV2Bloc _pinnedStopsV2Bloc;
   final FToast _fToast = FToast();
   final Widget _successToast = Container(
     padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
@@ -110,6 +118,24 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
       ],
     ),
   );
+
+  final Widget _pinFailToast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: Colors.greenAccent,
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.check),
+        SizedBox(
+          width: 12.0,
+        ),
+        Text("Failed to pin this stop!"),
+      ],
+    ),
+  );
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   late StreamController<StopInfoStreamModel> _stopInfoStreamController;
@@ -119,7 +145,8 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
       this.stopsLocationsMapBloc,
       this.nextBusScheduleBloc,
       this.scheduledNotificationsBloc,
-      this._pinnedStopsBloc);
+      this._pinnedStopsBloc,
+      this._pinnedStopsV2Bloc);
 
   final Completer<GoogleMapController> _controller = Completer();
 
@@ -357,8 +384,26 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                                 color: Colors.cyanAccent,
                               ),
                               onPressed: () => {
-                                    _pinnedStopsBloc.add(
-                                        new PinStopRequested(snapshot.data!))
+                                    _pinnedStopsV2Bloc
+                                        .addPinnedStop(new PinStopRequested(
+                                            snapshot.data!))
+                                        .then((isSuccessful) {
+                                      if (isSuccessful) {
+                                        _fToast.showToast(
+                                            child: _pinSuccessToast,
+                                            gravity: ToastGravity.BOTTOM,
+                                            toastDuration:
+                                                Duration(seconds: 2));
+                                      } else {
+                                        _fToast.showToast(
+                                            child: _pinFailToast,
+                                            gravity: ToastGravity.BOTTOM,
+                                            toastDuration:
+                                                Duration(seconds: 2));
+                                      }
+                                    }),
+                                    /*_pinnedStopsBloc.add(
+                                        new PinStopRequested(snapshot.data!))*/
                                   })
                         ])),
             panel: BlocBuilder<NextBusScheduleBloc, NextBusScheduleState>(
@@ -367,7 +412,7 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                 if (state is NextBusScheduleLoadSuccess) {
                   return Padding(
                       padding: EdgeInsets.only(
-                          left: 10.0, right: 0.0, top: 25.0, bottom: 0.0),
+                          left: 10.0, right: 0.0, top: 50.0, bottom: 0.0),
                       child: getNextBusSchedulesList(
                           state.nextBusStopInfo, state.stopNo));
                 } else if (state is NextBusScheduleLoadInProgress ||
