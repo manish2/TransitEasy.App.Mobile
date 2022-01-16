@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:TransitEasy/clients/models/api_response_status.dart';
 import 'package:TransitEasy/clients/models/vehicles_location_result.dart';
+import 'package:TransitEasy/common/utils/font_builder.dart';
 import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/constants.dart';
 import 'package:flutter/material.dart';
@@ -165,13 +166,20 @@ class _VehicleLocationLayout extends State<VehicleLocationLayout> {
                   child: Icon(Icons.navigate_before),
                 ),
               ),
-              Container(
-                color: Colors.cyanAccent,
-                child: Text(_liveResult
-                        .vehicleLocations[_focusedBusIndex].pattern +
-                    " " +
-                    _liveResult.vehicleLocations[_focusedBusIndex].direction),
-              ),
+              Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * .05,
+                    color: Colors.cyanAccent,
+                    child: Text(
+                      _liveResult.vehicleLocations[_focusedBusIndex].pattern +
+                          " " +
+                          _liveResult
+                              .vehicleLocations[_focusedBusIndex].direction,
+                      style: FontBuilder.buildCommonAppThemeFont(
+                          20, Colors.black87),
+                    ),
+                  )),
               Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(

@@ -26,6 +26,7 @@ import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/constants.dart';
 import 'package:TransitEasy/screen.dart';
 import 'package:TransitEasy/screens/stopslocation/stop_details.dart';
+import 'package:TransitEasy/screens/stopslocation/stop_details_v2.dart';
 import 'package:TransitEasy/screens/stopslocation/stop_info_stream_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -192,7 +193,10 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                       stopInfo.stopNo,
                       stopInfo.stopName,
                       stopInfo.latitude,
-                      stopInfo.longitude)),
+                      stopInfo.longitude,
+                      stopInfo.isWheelchairAccessible,
+                      stopInfo.distance,
+                      stopInfo.routes)),
                   nextBusScheduleBloc.add(NextBusScheduleRequested(
                       stopInfo.stopNo, stopInfo.latitude, stopInfo.longitude))
                 },
@@ -281,7 +285,7 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                           onPressed: () {},
                           menuItems: [
                             FocusedMenuItem(
-                                title: Text("Remind me when this bus is close"),
+                                title: Text("Create reminder"),
                                 trailingIcon: Icon(Icons.alarm_add),
                                 onPressed: () {
                                   scheduledNotificationsBloc
@@ -402,8 +406,15 @@ class StopsLocationsLayoutState extends State<StopsLocationsLayout> {
                                                 Duration(seconds: 2));
                                       }
                                     }),
-                                    /*_pinnedStopsBloc.add(
-                                        new PinStopRequested(snapshot.data!))*/
+                                  }),
+                          FocusedMenuItem(
+                              title: Text("View details"),
+                              onPressed: () => {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return StopDetailsV2(snapshot.data!);
+                                        })
                                   })
                         ])),
             panel: BlocBuilder<NextBusScheduleBloc, NextBusScheduleState>(

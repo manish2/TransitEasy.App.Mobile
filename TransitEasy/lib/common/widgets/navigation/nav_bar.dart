@@ -68,8 +68,7 @@ class NavBar extends StatelessWidget {
                 icon: Icons.bus_alert,
                 showDivider: true,
                 onTapListener: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed('/');
+                  Navigator.of(context).pushReplacementNamed('/');
                 },
               ),
               NavbarItem(
@@ -77,48 +76,45 @@ class NavBar extends StatelessWidget {
                   icon: Icons.location_pin,
                   showDivider: true,
                   onTapListener: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/trackmybus');
+                    Navigator.of(context).pushReplacementNamed('/trackmybus');
                   }),
               NavbarItem(
                   title: 'Enter Stop Number',
                   icon: Icons.search,
                   showDivider: true,
                   onTapListener: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/stopnumber');
+                    Navigator.of(context).pushReplacementNamed('/stopnumber');
                   }),
               NavbarItem(
                   title: 'Skytrain Schedules',
                   icon: Icons.train,
                   showDivider: true,
                   onTapListener: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/skytrainschedule');
+                    Navigator.of(context)
+                        .pushReplacementNamed('/skytrainschedule');
                   }),
               NavbarItem(
                   title: 'Seabus Schedules',
                   icon: Icons.directions_ferry,
                   showDivider: true,
                   onTapListener: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/seabusschedule');
+                    Navigator.of(context)
+                        .pushReplacementNamed('/seabusschedule');
                   }),
               NavbarItem(
                   title: 'Service Alerts',
                   icon: Icons.info,
                   showDivider: true,
                   onTapListener: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/servicealerts');
+                    Navigator.of(context)
+                        .pushReplacementNamed('/servicealerts');
                   }),
               NavbarItem(
                 title: 'Settings',
                 icon: Icons.settings,
                 showDivider: false,
                 onTapListener: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed('/settings');
+                  Navigator.of(context).pushReplacementNamed('/settings');
                 },
               ),
               Container(

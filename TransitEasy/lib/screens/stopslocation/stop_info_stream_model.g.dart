@@ -12,6 +12,9 @@ StopInfoStreamModel _$StopInfoStreamModelFromJson(Map<String, dynamic> json) {
     json['stopName'] as String,
     (json['stopLat'] as num).toDouble(),
     (json['stopLong'] as num).toDouble(),
+    json['isWheelchairAccessible'] as bool,
+    json['distance'] as int,
+    (json['routes'] as List<dynamic>?)?.map((e) => e as String).toList(),
   );
 }
 
@@ -22,4 +25,7 @@ Map<String, dynamic> _$StopInfoStreamModelToJson(
       'stopName': instance.stopName,
       'stopLat': instance.stopLat,
       'stopLong': instance.stopLong,
+      'isWheelchairAccessible': instance.isWheelchairAccessible,
+      'distance': instance.distance,
+      'routes': instance.routes,
     };
