@@ -83,6 +83,7 @@ class _PinnedStopSearchScreenState extends State<PinnedStopSearchScreen> {
 
   @override
   void initState() {
+    _fToast.init(context);
     _nextBusScheduleBloc.add(NextBusScheduleRequested(
         _model.stopNo, _model.stopLat, _model.stopLong));
     super.initState();

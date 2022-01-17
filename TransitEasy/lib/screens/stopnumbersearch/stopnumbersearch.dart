@@ -20,7 +20,17 @@ import 'package:focused_menu/modals.dart';
 
 import '../../constants.dart';
 
-class StopNumberSearchScreen extends StatelessWidget {
+class StopNumberSearchScreen extends StatefulWidget {
+  final StopNumberSearchBloc _nextBusScheduleBloc;
+  final ScheduledNotificationsBloc _scheduledNotificationsBloc;
+  StopNumberSearchScreen(
+      this._nextBusScheduleBloc, this._scheduledNotificationsBloc);
+  @override
+  State<StatefulWidget> createState() => _StopNumberSearchScreenState(
+      this._nextBusScheduleBloc, this._scheduledNotificationsBloc);
+}
+
+class _StopNumberSearchScreenState extends State<StopNumberSearchScreen> {
   final NavBar _navBar = new NavBar();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final StopNumberSearchBloc _nextBusScheduleBloc;
@@ -66,8 +76,14 @@ class StopNumberSearchScreen extends StatelessWidget {
     ),
   );
 
-  StopNumberSearchScreen(
+  _StopNumberSearchScreenState(
       this._nextBusScheduleBloc, this._scheduledNotificationsBloc);
+
+  @override
+  void initState() {
+    _fToast.init(context);
+    super.initState();
+  }
 
   Widget getLoadingScreen() {
     return Container(
