@@ -14,14 +14,14 @@ import 'package:TransitEasy/provider/route_provider.dart';
 import 'package:TransitEasy/repositories/repositories.dart';
 import 'package:TransitEasy/repositories/usersettings_repository.dart';
 import 'package:TransitEasy/screens/stopslocation/stops_locations.dart';
-import 'package:TransitEasy/services/dynamic_link_service.dart';
 import 'package:TransitEasy/services/geolocation_service.dart';
 import 'package:TransitEasy/services/settings_service.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/observers/default_bloc_observer.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 void main() {
   Bloc.observer = DefaultBlocObserver();
@@ -35,6 +35,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final GeoLocationService _geoLocationService = GeoLocationService();
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  final AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    importance: Importance.max,
+  );
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -101,30 +108,30 @@ class _MyAppState extends State<MyApp> {
 
   Future initApp() async {
     await Firebase.initializeApp();
-    //await handleDynamicLinks();
-  }
+    var initializationSettings = new InitializationSettings(
+        android: new AndroidInitializationSettings('@mipmap/ic_launcher'));
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
 
-  /*Future handleDynamicLinks() async {
-    final PendingDynamicLinkData? data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
-    _handleDeepLink(data);
-
-    FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData? data) async {
-      _handleDeepLink(data);
-    }, onError: (OnLinkErrorException e) async {
-      print("Dynamic link failed $e");
+      if (notification != null && android != null) {
+        _flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(channel.id, channel.name),
+            ));
+      }
     });
   }
-
-  void _handleDeepLink(PendingDynamicLinkData? data) {
-    final Uri? deepLink = data?.link;
-    print(deepLink?.queryParameters.toString());
-    var x = deepLink?.queryParameters;
-    if (deepLink != null) {
-      Navigator.of(context).pushNamed(deepLink.path);
-    }
-  }*/
 
   @override
   void dispose() {
