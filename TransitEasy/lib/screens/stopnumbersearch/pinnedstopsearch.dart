@@ -201,8 +201,7 @@ class _PinnedStopSearchScreenState extends State<PinnedStopSearchScreen> {
                                       onPressed: () {},
                                       menuItems: [
                                         FocusedMenuItem(
-                                            title: Text(
-                                                "Remind me when this bus is close"),
+                                            title: Text("Create reminder"),
                                             trailingIcon: Icon(Icons.alarm_add),
                                             onPressed: () {
                                               _scheduledNotificationsBloc

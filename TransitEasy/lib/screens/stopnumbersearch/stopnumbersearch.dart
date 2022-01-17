@@ -1,7 +1,10 @@
 import 'package:TransitEasy/blocs/events/nextbuschedule/nextbusschedule_requested.dart';
+import 'package:TransitEasy/blocs/events/schedulednotifications/create_scheduled_notification_requested.dart';
+import 'package:TransitEasy/blocs/schedulednotifications_bloc.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_in_progress.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_load_success.dart';
 import 'package:TransitEasy/blocs/states/nextbusschedule/nextbusschedule_state.dart';
+import 'package:TransitEasy/blocs/states/schedulednotifications/scheduled_notification_add_succeeded.dart';
 import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
 import 'package:TransitEasy/clients/models/nextbus_schedule_status.dart';
 import 'package:TransitEasy/clients/models/nextbus_stop_info.dart';
@@ -11,6 +14,9 @@ import 'package:TransitEasy/common/widgets/navigation/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 
 import '../../constants.dart';
 
@@ -18,13 +24,50 @@ class StopNumberSearchScreen extends StatelessWidget {
   final NavBar _navBar = new NavBar();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final StopNumberSearchBloc _nextBusScheduleBloc;
+  final ScheduledNotificationsBloc _scheduledNotificationsBloc;
   final ButtonStyle style = ElevatedButton.styleFrom(
       primary: Colors.cyanAccent,
       onPrimary: Colors.black87,
       textStyle: FontBuilder.buildCommonAppThemeFont(20, Colors.black87));
   final textFieldController = TextEditingController();
+  final FToast _fToast = FToast();
+  final Widget _successToast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: Colors.greenAccent,
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.check),
+        SizedBox(
+          width: 12.0,
+        ),
+        Text("Notification scheduled succesfully!"),
+      ],
+    ),
+  );
+  final Widget _failToast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: Colors.redAccent,
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.error),
+        SizedBox(
+          width: 12.0,
+        ),
+        Text("Failed to save schedule notification!"),
+      ],
+    ),
+  );
 
-  StopNumberSearchScreen(this._nextBusScheduleBloc);
+  StopNumberSearchScreen(
+      this._nextBusScheduleBloc, this._scheduledNotificationsBloc);
 
   Widget getLoadingScreen() {
     return Container(
@@ -71,13 +114,48 @@ class StopNumberSearchScreen extends StatelessWidget {
                             child: Text(e.routeDescription),
                           ),
                           children: e.schedules
-                              .map((schedule) => ListTile(
-                                    title: Text(schedule.destination),
-                                    subtitle: Text(
-                                        "STATUS: ${getStatusString(schedule.scheduleStatus)}"),
-                                    trailing:
-                                        Text("${schedule.countdownInMin} min"),
-                                  ))
+                              .map((schedule) => FocusedMenuHolder(
+                                      child: ListTile(
+                                        title: Text(schedule.destination),
+                                        subtitle: Text(
+                                            "STATUS: ${getStatusString(schedule.scheduleStatus)}"),
+                                        trailing: Text(
+                                            "${schedule.countdownInMin} min"),
+                                      ),
+                                      onPressed: () {},
+                                      menuItems: [
+                                        FocusedMenuItem(
+                                            title: Text("Create reminder"),
+                                            trailingIcon: Icon(Icons.alarm_add),
+                                            onPressed: () {
+                                              _scheduledNotificationsBloc
+                                                  .handleEvent(
+                                                      CreateScheduledNotificationRequested(
+                                                schedule.expectedLeaveTime,
+                                                e.routeDescription,
+                                                schedule.destination,
+                                                textFieldController.text,
+                                              ))
+                                                  .then((value) {
+                                                if (value
+                                                    is ScheduledNotificationAddSucceeded) {
+                                                  _fToast.showToast(
+                                                      child: _successToast,
+                                                      gravity:
+                                                          ToastGravity.BOTTOM,
+                                                      toastDuration:
+                                                          Duration(seconds: 2));
+                                                } else {
+                                                  _fToast.showToast(
+                                                      child: _failToast,
+                                                      gravity:
+                                                          ToastGravity.BOTTOM,
+                                                      toastDuration:
+                                                          Duration(seconds: 2));
+                                                }
+                                              });
+                                            })
+                                      ]))
                               .toList(),
                           childrenPadding: EdgeInsets.all(10.0),
                         ),

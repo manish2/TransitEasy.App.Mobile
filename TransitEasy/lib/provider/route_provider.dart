@@ -3,7 +3,6 @@ import 'package:TransitEasy/blocs/permissions_bloc.dart';
 import 'package:TransitEasy/blocs/schedulednotifications_bloc.dart';
 import 'package:TransitEasy/blocs/servicealerts_bloc.dart';
 import 'package:TransitEasy/blocs/stopnumbersearch_bloc.dart';
-import 'package:TransitEasy/clients/clients.dart';
 import 'package:TransitEasy/clients/transiteasy_scheduler_api_client.dart';
 import 'package:TransitEasy/common/widgets/error/error_page.dart';
 import 'package:TransitEasy/repositories/usersettings_repository.dart';
@@ -46,7 +45,15 @@ class RouteProvider {
         return MaterialPageRoute(builder: (BuildContext context) {
           final StopNumberSearchBloc _stopNumberSearchBloc =
               BlocProvider.of<StopNumberSearchBloc>(context);
-          return StopNumberSearchScreen(_stopNumberSearchBloc);
+          TransitEasySchedulerApiClient apiClient =
+              new TransitEasySchedulerApiClient();
+          SettingsService service = new SettingsService();
+          UserSettingsRepository repository =
+              new UserSettingsRepository(service);
+          final ScheduledNotificationsBloc _scheduledNotificationBloc =
+              new ScheduledNotificationsBloc(apiClient, repository);
+          return StopNumberSearchScreen(
+              _stopNumberSearchBloc, _scheduledNotificationBloc);
         });
       case '/seabusschedule':
         return MaterialPageRoute(builder: (BuildContext context) {
